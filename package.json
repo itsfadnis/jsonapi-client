@@ -1,9 +1,10 @@
 {
   "name": "jsonapi-client",
   "version": "1.0.0",
-  "main": "dist/index.js",
+  "main": "dist/bundle.js",
   "scripts": {
-    "build": "webpack"
+    "build": "webpack",
+    "prepublish": "npm run build"
   },
   "author": "Nikhil Fadnis",
   "license": "ISC",
