@@ -1,5 +1,5 @@
 {
-  "name": "jsonapi-client",
+  "name": "@itsfadnis/jsonapi-client",
   "version": "1.0.0",
   "main": "dist/bundle.js",
   "scripts": {
