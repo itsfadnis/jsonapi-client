@@ -1,6 +1,6 @@
-import Errors from './model-errors';
+const Errors = require('./model-errors');
 
-export default class Base {
+class Base {
   constructor(args = {}) {
     this.id = !!args.id ? String(args.id) : Math.random().toString(36).substring(2, 15);
     this._errors = new Errors();
@@ -156,3 +156,5 @@ export default class Base {
     return new this(args);
   }
 }
+
+module.exports = Base;

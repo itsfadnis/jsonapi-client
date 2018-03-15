@@ -1,6 +1,6 @@
-import Inflector from 'inflected';
+const Inflector = require('inflected');
 
-export default class Errors {
+class Errors {
   constructor(args = {}) {
     this._errors = {};
     this._jsonErrors = args.data && args.data.errors ? args.data.errors : [];
@@ -51,3 +51,5 @@ export default class Errors {
     return this._errors;
   }
 }
+
+module.exports = Errors;

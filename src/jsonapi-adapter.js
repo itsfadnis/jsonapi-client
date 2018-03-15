@@ -1,11 +1,11 @@
-import HttpAdapter from './http-adapter';
-import {
-  Serializer as JSONAPISerializer,
-  Deserializer as JSONAPIDeserializer
-} from 'jsonapi-serializer';
-import Inflector from 'inflected';
+const HttpAdapter = require('./http-adapter');
+const {
+  Serializer: JSONAPISerializer,
+  Deserializer: JSONAPIDeserializer
+} = require('jsonapi-serializer');
+const Inflector = require('inflected');
 
-export default class JSONAPIAdapter extends HttpAdapter {
+class JSONAPIAdapter extends HttpAdapter {
   constructor(args = {}) {
     super(args);
   }
@@ -65,3 +65,5 @@ export default class JSONAPIAdapter extends HttpAdapter {
     });
   }
 }
+
+module.exports = JSONAPIAdapter;

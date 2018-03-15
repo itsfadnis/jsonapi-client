@@ -1,4 +1,4 @@
-export default class HttpAdapter {
+class HttpAdapter {
   constructor(args = {}) {
     this.baseURL = args.baseURL || `${ window.location.protocol }//${ window.location.host }`;
     this.namespace = args.namespace || '';
@@ -74,3 +74,5 @@ export default class HttpAdapter {
     });
   }
 }
+
+module.exports = HttpAdapter;
