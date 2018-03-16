@@ -39,7 +39,7 @@ class HttpAdapter {
     });
 
     return fetch(request).then((response) => {
-      this._parseResponse(response).then((json) => {
+      return this._parseResponse(response).then((json) => {
         if (response.ok) {
           return json;
         }
