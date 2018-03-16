@@ -47,21 +47,23 @@ class JSONAPIAdapter extends HttpAdapter {
   }
 
   deserialize(json, opts = { keyForAttribute: 'camelCase' }) {
-    return !!json ? new JSONAPIDeserializer(opts).deserialize(json) : Promise.resolve(null);
+    return new JSONAPIDeserializer(opts).deserialize(json);
   }
 
   request(method, url, data = {}) {
     const payload = ['POST', 'PATCH', 'PUT'].indexOf(method) > -1 ? this.serialize(data) : null;
 
-    return new Promise((resolve, reject) => {
-      super.request(method, url, payload).then((response) => {
-        this.deserialize(response.data).then((json) => {
-          response.data = json;
-          resolve(response);
-        });
-      }).catch((response) => {
-        reject(response);
+    return super.request(method, url, payload).then((response) => {
+      if (!response.data) {
+        return response;
+      }
+
+      return this.deserialize(response.data).then((json) => {
+        response.data = json;
+        return response;
       });
+    }).catch((response) => {
+      throw response;
     });
   }
 }

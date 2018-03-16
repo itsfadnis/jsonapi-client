@@ -38,12 +38,13 @@ class HttpAdapter {
       body: ['POST', 'PUT', 'PATCH'].indexOf(method) > -1 ? JSON.stringify(data) : null
     });
 
-    return new Promise((resolve, reject) => {
-      fetch.call(window, request).then((response) => {
-        this._parseResponse(response).then((json) => {
-          return response.ok ? resolve(json) : reject(json);
-        });
-      }).catch((err) => reject(err));
+    return fetch(request).then((response) => {
+      this._parseResponse(response).then((json) => {
+        if (response.ok) {
+          return json;
+        }
+        throw json;
+      });
     });
   }
 

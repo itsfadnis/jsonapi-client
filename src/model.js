@@ -104,8 +104,6 @@ class Base {
   }
 
   _create() {
-    if (!this.valid) return Promise.reject(new Error('Unprocessable Entity'));
-
     return this.constructor.adapter
       .post(this.baseURL, this)
       .then(({ data }) => this.constructor.new(data))
@@ -116,8 +114,6 @@ class Base {
   }
 
   _update() {
-    if (!this.valid) return Promise.reject(new Error('Unprocessable Entity'));
-
     return this.constructor.adapter
       .patch(`${ this.baseURL }/${ this.id }`, this)
       .then(({ data }) => this.constructor.new(data))
