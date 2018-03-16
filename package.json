@@ -13,7 +13,7 @@
   "description": "A convenient module to consume a jsonapi service",
   "dependencies": {
     "inflected": "^2.0.4",
-    "jsonapi-serializer": "^3.5.6"
+    "jsonapi-serializer": "git+https://github.com/itsfadnis/jsonapi-serializer.git"
   },
   "devDependencies": {
     "@babel/cli": "^7.0.0-beta.42",
