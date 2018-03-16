@@ -21,5 +21,9 @@
     "@babel/preset-env": "^7.0.0-beta.42",
     "eslint": "^4.18.2",
     "jest": "^23.0.0-alpha.0"
+  },
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/itsfadnis/jsonapi-client.git"
   }
 }
