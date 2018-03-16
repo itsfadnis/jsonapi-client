@@ -1,13 +1,16 @@
 const path = require('path');
 
 module.exports = {
-  mode: 'production',
+  mode: 'development',
   entry: {
     main: './src/index.js'
   },
   output: {
     filename: 'bundle.js',
-    path: path.resolve(__dirname, 'dist')
+    path: path.resolve(__dirname, 'dist'),
+    library: '@itsfadnis/jsonapi-client',
+    libraryTarget: 'umd',
+    umdNamedDefine: true
   },
   module: {
     rules: [
