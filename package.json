@@ -1,9 +1,9 @@
 {
   "name": "@itsfadnis/jsonapi-client",
   "version": "1.0.4",
-  "main": "dist/bundle.js",
+  "main": "dist/index.js",
   "scripts": {
-    "build": "webpack",
+    "build": "babel src --presets @babel/preset-env --plugins @babel/plugin-proposal-object-rest-spread --out-dir dist",
     "prepublish": "npm run build"
   },
   "author": "Nikhil Fadnis",
@@ -14,10 +14,8 @@
     "jsonapi-serializer": "^3.5.6"
   },
   "devDependencies": {
-    "@babel/core": "^7.0.0-beta.41",
-    "@babel/preset-env": "^7.0.0-beta.41",
-    "babel-loader": "^8.0.0-beta",
-    "webpack": "^4.1.1",
-    "webpack-cli": "^2.0.12"
+    "@babel/cli": "^7.0.0-beta.42",
+    "@babel/core": "^7.0.0-beta.42",
+    "@babel/preset-env": "^7.0.0-beta.42"
   }
 }
