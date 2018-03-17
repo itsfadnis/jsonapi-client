@@ -25,5 +25,8 @@
   "repository": {
     "type": "git",
     "url": "https://github.com/itsfadnis/jsonapi-client.git"
+  },
+  "jest": {
+    "collectCoverage": true
   }
 }
