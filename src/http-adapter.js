@@ -26,7 +26,7 @@ class HttpAdapter {
     return this.request('PUT', url, data);
   }
 
-  delete(url, data = null) {
+  delete(url, data) {
     return this.request('DELETE', url, data);
   }
 
