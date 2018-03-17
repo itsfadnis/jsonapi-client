@@ -15,16 +15,13 @@ class Errors {
     this._jsonErrors = [];
   }
 
-  add(attribute, code, details = null) {
+  add(attribute, code, detail) {
     const attr = Inflector.camelize(Inflector.underscore(attribute), false);
     this._errors[attr] = this._errors[attr] || [];
-    const errorCodes = this._errors[attr].map((error) => error.code);
-    if (errorCodes.indexOf(code) === -1) {
-      this._errors[attr].push({
-        code,
-        details
-      });
-    }
+    this._errors[attr].push({
+      code,
+      detail
+    });
   }
 
   generate() {
@@ -43,7 +40,7 @@ class Errors {
           }
         });
       }
-      this.add(attribute.join('.'), error.code, error.details);
+      this.add(attribute.join('.'), error.code, error.detail);
     });
   }
 
