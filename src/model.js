@@ -139,8 +139,8 @@ class Base {
       .catch((err) => { throw err; });
   }
 
-  request(method, url, data = {}) {
-    return this.constructor.request(method, url, data);
+  request(method, url, data) {
+    return this.constructor.adapter.request(method, url, data);
   }
 
   _process422Response(response) {
