@@ -3,7 +3,7 @@
   "version": "1.0.11",
   "main": "dist/index.js",
   "scripts": {
-    "build": "babel src --presets @babel/preset-env --plugins @babel/plugin-proposal-object-rest-spread --out-dir dist",
+    "build": "babel src --out-dir dist",
     "test": "jest",
     "lint": "eslint src test",
     "prepublish": "npm run build"
@@ -18,7 +18,10 @@
   "devDependencies": {
     "@babel/cli": "^7.0.0-beta.42",
     "@babel/core": "^7.0.0-beta.42",
+    "@babel/plugin-proposal-class-properties": "^7.0.0-beta.42",
     "@babel/preset-env": "^7.0.0-beta.42",
+    "babel-core": "^7.0.0-0",
+    "babel-jest": "^22.4.3",
     "eslint": "^4.18.2",
     "jest": "^23.0.0-alpha.0"
   },
