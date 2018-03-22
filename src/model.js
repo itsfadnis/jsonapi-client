@@ -1,6 +1,8 @@
 const Errors = require('./jsonapi-error');
 
 class Base {
+  static baseURL = '';
+
   constructor(args = {}) {
     this.id = !!args.id ? String(args.id) : Math.random().toString(36).substring(2, 15);
     this._errors = new Errors();
