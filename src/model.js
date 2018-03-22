@@ -1,4 +1,4 @@
-const Errors = require('./model-errors');
+const Errors = require('./jsonapi-error');
 
 class Base {
   constructor(args = {}) {
@@ -75,7 +75,7 @@ class Base {
   get valid() {
     this.errors.clear();
     this.validate();
-    return this.errors.count === 0;
+    return this.errors.count() === 0;
   }
 
   // Run model validations in this hook
@@ -83,7 +83,12 @@ class Base {
   // class Foo extends Base {
   //   validate() {
   //     if (isBlank(this.name)) {
-  //       this.errors.add('name', 'blank');
+  //       this.errors.add({
+  //         code: 'blank',
+  //         source: {
+  //           pointer: '/data/attributes/name'
+  //         }
+  //       });
   //     }
   //   }
   // }
@@ -144,8 +149,7 @@ class Base {
   }
 
   _process422Response(response) {
-    this._errors = new Errors(response);
-    this._errors.generate();
+    this._errors = new Errors(response.data);
   }
 
   static new(args = {}) {
