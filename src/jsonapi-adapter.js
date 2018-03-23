@@ -7,7 +7,9 @@ const Inflector = require('inflected');
 
 class JSONAPIAdapter extends HttpAdapter {
   constructor(args = {}) {
-    super(args);
+    const { deserializerOptions, ...rest } = args;
+    super(rest);
+    this.deserializerOptions = deserializerOptions || {};
   }
 
   _serializedRelationships(model) {
@@ -46,11 +48,11 @@ class JSONAPIAdapter extends HttpAdapter {
     return new JSONAPISerializer(this._collectionName(model), this._serializerOptions(model)).serialize(model);
   }
 
-  deserialize(json, opts = { keyForAttribute: 'camelCase' }) {
+  deserialize(json, opts) {
     return new JSONAPIDeserializer(opts).deserialize(json);
   }
 
-  request(method, url, data = {}) {
+  request(method, url, data) {
     const payload = ['POST', 'PATCH', 'PUT'].indexOf(method) > -1 ? this.serialize(data) : null;
 
     return super.request(method, url, payload).then((response) => {
@@ -58,7 +60,7 @@ class JSONAPIAdapter extends HttpAdapter {
         return response;
       }
 
-      return this.deserialize(response.data).then((json) => {
+      return this.deserialize(response.data, this.deserializerOptions).then((json) => {
         response.data = json;
         return response;
       });

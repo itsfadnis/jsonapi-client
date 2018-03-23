@@ -31,6 +31,9 @@
     "url": "https://github.com/itsfadnis/jsonapi-client.git"
   },
   "jest": {
-    "collectCoverage": true
+    "collectCoverage": true,
+    "moduleNameMapper": {
+      "jsonapi-serializer": "<rootDir>/test/__mocks__/jsonapi-serializer.js"
+    }
   }
 }
