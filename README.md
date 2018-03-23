@@ -25,9 +25,15 @@ Model.adapter = new JSONAPIAdapter({
   namespace: '/v2',
   headers: {
     key: 'value'
+  },
+  deserializerOptions: {
+    keyForAttribute: 'camelCase'
   }
 });
 ```
+
+- [Deserialization options](https://github.com/itsfadnis/jsonapi-serializer#available-deserialization-option-opts-argument)
+
 
 ### Model definition
 
