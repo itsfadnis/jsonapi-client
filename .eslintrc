@@ -15,11 +15,6 @@
     "strict": [2, "never"],
 
     /**
-     * ES6
-     */
-    "no-var": 2,                     // http://eslint.org/docs/rules/no-var
-
-    /**
      * Variables
      */
     "no-shadow": 2,                  // http://eslint.org/docs/rules/no-shadow
