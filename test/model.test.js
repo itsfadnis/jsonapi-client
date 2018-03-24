@@ -163,7 +163,7 @@ describe('Model', () => {
           expect(Model._constructBaseUrl.mock.calls[0][0]).toEqual({ foo: 'bar' });
 
           expect(Model.adapter.get.mock.calls.length).toBe(1);
-          expect(Model.adapter.get.mock.calls[0][0]).toEqual('/xyz');
+          expect(Model.adapter.get.mock.calls[0]).toEqual(['/xyz', Model]);
 
           expect(response).toEqual(mockResponse.data.map(r => new Model(r)));
         });
@@ -228,7 +228,7 @@ describe('Model', () => {
           expect(Model._constructBaseUrl.mock.calls[0][0]).toEqual({ foo: 'bar' });
 
           expect(Model.adapter.get.mock.calls.length).toBe(1);
-          expect(Model.adapter.get.mock.calls[0][0]).toEqual('/xyz/123');
+          expect(Model.adapter.get.mock.calls[0]).toEqual(['/xyz/123', Model]);
 
           expect(response).toEqual(new Model({ id: '123' }));
         });
@@ -607,6 +607,46 @@ describe('Model', () => {
           post_id: 101,
           comment_id: 234
         })).toBe('/posts/101/comments/234/likes');
+      });
+    });
+  });
+
+  describe('#serializerOptions()', () => {
+    test('it returns the right options', () => {
+      const model = new Model();
+
+      const attributesSpy = jest.spyOn(model, 'attributes', 'get').mockReturnValue({
+        firstName: 'John',
+        lastName: 'Doe'
+      });
+
+      const relationshipsSpy = jest.spyOn(model, 'relationships', 'get').mockReturnValue({
+        address: {
+          type: 'work',
+          street: 'Dogwood Way',
+          zip: '12345',
+          get attributes() {
+            return ['type', 'street', 'zip'];
+          }
+        }
+      });
+
+      expect(model.serializerOptions()).toEqual({
+        attributes: ['firstName', 'lastName', 'address'],
+        address: {
+          ref: 'id',
+          attributes: ['type', 'street', 'zip']
+        }
+      });
+      expect(attributesSpy).toHaveBeenCalled();
+      expect(relationshipsSpy).toHaveBeenCalled();
+    });
+  });
+
+  describe('.deserializerOptions', () => {
+    test('it returns the right defaults', () => {
+      expect(Model.deserializerOptions).toEqual({
+        keyForAttribute: 'camelCase'
       });
     });
   });

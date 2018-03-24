@@ -25,6 +25,33 @@ class Base {
     return url;
   }
 
+  serializerOptions() {
+    let object = {};
+
+    const attributes = this.attributes;
+    const relationships = this.relationships;
+
+    object.attributes = [
+      ...Object.keys(attributes),
+      ...Object.keys(relationships)
+    ];
+
+    for (const key in relationships) {
+      if (relationships.hasOwnProperty(key)) {
+        object[key] = {
+          ref: 'id',
+          attributes: relationships[key].attributes
+        };
+      }
+    }
+
+    return object;
+  }
+
+  static deserializerOptions = {
+    keyForAttribute: 'camelCase'
+  };
+
   get baseURL() {
     return this.constructor._constructBaseUrl();
   }
@@ -98,14 +125,14 @@ class Base {
 
   static fetch(id, args = {}) {
     return this.adapter
-      .get(`${ this._constructBaseUrl(args) }/${ id }`)
+      .get(`${ this._constructBaseUrl(args) }/${ id }`, this)
       .then(({ data }) => this.new(data))
       .catch((err) => { throw err; });
   }
 
   static fetchAll(args = {}) {
     return this.adapter
-      .get(`${ this._constructBaseUrl(args) }`)
+      .get(`${ this._constructBaseUrl(args) }`, this)
       .then(({ data }) => data.map((object) => this.new(object)))
       .catch((err) => { throw err; });
   }
