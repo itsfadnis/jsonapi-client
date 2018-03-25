@@ -17,26 +17,36 @@ $ yarn add @itsfadnis/jsonapi-client
 ### Configure
 
 ```javascript
-import { JSONAPIAdapter, Model } from '@itsfadnis/jsonapi-client';
+import { HttpAdapter, Model } from '@itsfadnis/jsonapi-client';
 
 // Setup an instance of the adapter for the model
-Model.adapter = new JSONAPIAdapter({
+Model.adapter = new HttpAdapter({
   baseURL: 'https://foo.com',
   namespace: '/v2',
   headers: {
     key: 'value'
-  },
-  deserializerOptions: {
-    keyForAttribute: 'camelCase'
   }
 });
 ```
 
-- [Deserialization options](https://github.com/itsfadnis/jsonapi-serializer#available-deserialization-option-opts-argument)
+### How serialization/deserialization works
 
+`@itsfadnis/jsonapi-client` internally uses [jsonapi-serializer](https://github.com/itsfadnis/jsonapi-serializer) for serializing/deserializing data to [JSON API](http://jsonapi.org/) (1.0 compliant)
+
+Models serialize themselves before making a request, and deserialize the recieved response into instances of the Model. This abstraction allows yours models to talk to a jsonapi service seamlessly without having to worry about the serialization/deserialization business.
+
+In any case if you want finer control, it can be done by overriding some defaults.
+
+Default serializer options are defined in the `Model#serializerOptions()` method, to override/customize them you can override this method on your model.
+
+Default deserializer options are defined on the static property `Model.deserializerOptions`, to override/customize them you can override this property.
+
+#### Available options
+
+- [Serializer options](https://github.com/itsfadnis/jsonapi-serializer#available-serialization-option-opts-argument)
+- [Deserializer options](https://github.com/itsfadnis/jsonapi-serializer#available-deserialization-option-opts-argument)
 
 ### Model definition
-
 
 ```javascript
 class Post extends Model {
