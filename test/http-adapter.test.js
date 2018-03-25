@@ -354,4 +354,49 @@ describe('HttpAdapter', () => {
       });
     });
   });
+
+  describe('#get(url)', () => {
+    test('it calls & returns #request(method, url, data) with the right params', () => {
+      const adapter = new HttpAdapter();
+      const requestSpy = jest.spyOn(adapter, 'request').mockReturnValue('something');
+      expect(adapter.get('/xyz')).toBe('something');
+      expect(requestSpy).toHaveBeenCalledWith('GET', '/xyz');
+    });
+  });
+
+  describe('#post(url, data)', () => {
+    test('it calls & returns #request(method, url, data) with the right params', () => {
+      const adapter = new HttpAdapter();
+      const requestSpy = jest.spyOn(adapter, 'request').mockReturnValue('something');
+      expect(adapter.post('/xyz', 'foo')).toBe('something');
+      expect(requestSpy).toHaveBeenCalledWith('POST', '/xyz', 'foo');
+    });
+  });
+
+  describe('#put(url, data)', () => {
+    test('it calls & returns #request(method, url, data) with the right params', () => {
+      const adapter = new HttpAdapter();
+      const requestSpy = jest.spyOn(adapter, 'request').mockReturnValue('something');
+      expect(adapter.put('/xyz', 'foo')).toBe('something');
+      expect(requestSpy).toHaveBeenCalledWith('PUT', '/xyz', 'foo');
+    });
+  });
+
+  describe('#patch(url)', () => {
+    test('it calls & returns #request(method, url, data) with the right params', () => {
+      const adapter = new HttpAdapter();
+      const requestSpy = jest.spyOn(adapter, 'request').mockReturnValue('something');
+      expect(adapter.patch('/xyz', 'foo')).toBe('something');
+      expect(requestSpy).toHaveBeenCalledWith('PATCH', '/xyz', 'foo');
+    });
+  });
+
+  describe('#delete(url)', () => {
+    test('it calls & returns #request(method, url, data) with the right params', () => {
+      const adapter = new HttpAdapter();
+      const requestSpy = jest.spyOn(adapter, 'request').mockReturnValue('something');
+      expect(adapter.delete('/xyz')).toBe('something');
+      expect(requestSpy).toHaveBeenCalledWith('DELETE', '/xyz');
+    });
+  });
 });

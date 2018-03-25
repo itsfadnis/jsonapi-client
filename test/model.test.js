@@ -1,6 +1,7 @@
 const Model = require('../src/model');
-const JSONAPIAdapter = require('../src/jsonapi-adapter');
+const HttpAdapter = require('../src/http-adapter');
 const JSONAPIError = require('../src/jsonapi-error');
+const JSONAPISerializer = require('jsonapi-serializer');
 
 describe('Model', () => {
   describe('instantiation', () => {
@@ -109,7 +110,7 @@ describe('Model', () => {
 
   describe('#request(method, url, data)', () => {
     beforeEach(() => {
-      Model.adapter = new JSONAPIAdapter();
+      Model.adapter = new HttpAdapter();
       Model.adapter.request = jest.fn().mockReturnValue('something');
     });
 
@@ -130,89 +131,114 @@ describe('Model', () => {
   });
 
   describe('.fetchAll(args)', () => {
-    let _constructBaseUrl;
-    beforeEach(() => {
-      _constructBaseUrl = Model._constructBaseUrl;
-    });
-
     afterEach(() => {
       delete Model.adapter;
-      Model._constructBaseUrl = _constructBaseUrl;
     });
 
     describe('on success', () => {
       test('it resolves to an array of instances of the model', () => {
-        Model.adapter = new JSONAPIAdapter();
+        Model.adapter = new HttpAdapter();
 
         const mockResponse = {
           code: 200,
           data: [{
-            id: 'foo'
+            type: 'users',
+            id: '123',
+            attributes: {
+              'first-name': 'John',
+              'last-name': 'Doe'
+            }
           }, {
-            id: 'bar'
+            type: 'users',
+            id: '456',
+            attributes: {
+              'first-name': 'Jane',
+              'last-name': 'Doe'
+            }
           }]
         };
 
-        Model.adapter.get = jest.fn().mockReturnValue(Promise.resolve(mockResponse));
-        Model._constructBaseUrl = jest.fn().mockReturnValue('/xyz');
+        const constructorBaseUrlSpy = jest.spyOn(Model, '_constructBaseUrl').mockReturnValue('/xyz');
+        const getSpy = jest.spyOn(Model.adapter, 'get').mockReturnValue(
+          Promise.resolve(mockResponse)
+        );
+
+        const mockDeserializedArray = [
+          new Model({
+            id: '123',
+            firstName: 'John',
+            lastName: 'Doe'
+          }),
+          new Model({
+            id: '456',
+            firstName: 'Jane',
+            lastName: 'Doe'
+          })
+        ];
+        const deserializeSpy = jest.spyOn(Model, 'deserialize').mockReturnValue(
+          Promise.resolve(mockDeserializedArray)
+        );
 
         return Model.fetchAll({
           foo: 'bar'
         }).then((response) => {
-          expect(Model._constructBaseUrl.mock.calls.length).toBe(1);
-          expect(Model._constructBaseUrl.mock.calls[0][0]).toEqual({ foo: 'bar' });
+          expect(constructorBaseUrlSpy.mock.calls.length).toBe(1);
+          expect(constructorBaseUrlSpy.mock.calls[0][0]).toEqual({ foo: 'bar' });
 
-          expect(Model.adapter.get.mock.calls.length).toBe(1);
-          expect(Model.adapter.get.mock.calls[0]).toEqual(['/xyz', Model]);
+          expect(getSpy.mock.calls.length).toBe(1);
+          expect(getSpy.mock.calls[0][0]).toEqual('/xyz');
 
-          expect(response).toEqual(mockResponse.data.map(r => new Model(r)));
+          expect(deserializeSpy).toHaveBeenCalledWith(mockResponse.data);
+          expect(response).toEqual(mockDeserializedArray);
+
+          deserializeSpy.mockRestore();
+          getSpy.mockRestore();
+          constructorBaseUrlSpy.mockRestore();
         });
       });
     });
 
     describe('on failure', () => {
       test('it rejects the recieved response', () => {
-        Model.adapter = new JSONAPIAdapter();
+        Model.adapter = new HttpAdapter();
 
         const mockResponse = {
           code: 500,
           status: 'Internal Server Error'
         };
 
-        Model.adapter.get = jest.fn().mockReturnValue(Promise.reject(mockResponse));
-        Model._constructBaseUrl = jest.fn().mockReturnValue('/xyz');
+        const getSpy = jest.spyOn(Model.adapter, 'get').mockReturnValue(Promise.reject(mockResponse));
+        const constructorBaseUrlSpy = jest.spyOn(Model, '_constructBaseUrl').mockReturnValue('/xyz');
 
         return Model.fetchAll({
           foo: 'bar'
         }).catch((response) => {
-          expect(Model._constructBaseUrl.mock.calls.length).toBe(1);
-          expect(Model._constructBaseUrl.mock.calls[0][0]).toEqual({ foo: 'bar' });
+          expect(constructorBaseUrlSpy.mock.calls.length).toBe(1);
+          expect(constructorBaseUrlSpy.mock.calls[0][0]).toEqual({ foo: 'bar' });
 
-          expect(Model.adapter.get.mock.calls.length).toBe(1);
-          expect(Model.adapter.get.mock.calls[0][0]).toEqual('/xyz');
+          expect(getSpy.mock.calls.length).toBe(1);
+          expect(getSpy.mock.calls[0][0]).toEqual('/xyz');
 
           expect(response).toEqual(mockResponse);
+
+          getSpy.mockRestore();
+          constructorBaseUrlSpy.mockRestore();
         });
       });
     });
   });
 
   describe('.fetch(id, args)', () => {
-    let _constructBaseUrl;
-    beforeEach(() => {
-      _constructBaseUrl = Model._constructBaseUrl;
-    });
-
     afterEach(() => {
       delete Model.adapter;
-      Model._constructBaseUrl = _constructBaseUrl;
     });
 
     describe('on success', () => {
       test('it resolves to an instance of the model', () => {
-        Model.adapter = new JSONAPIAdapter();
+        Model.adapter = new HttpAdapter();
 
-        Model.adapter.get = jest.fn().mockReturnValue(
+        const constructorBaseUrlSpy = jest.spyOn(Model, '_constructBaseUrl').mockReturnValue('/xyz');
+        const getSpy = jest.spyOn(Model.adapter, 'get').mockReturnValue(
           Promise.resolve({
             code: 200,
             data: {
@@ -221,23 +247,30 @@ describe('Model', () => {
           })
         );
 
-        Model._constructBaseUrl = jest.fn().mockReturnValue('/xyz');
+        const mockDeserializedObject = new Model({ id: '123' });
+        const deserializeSpy = jest.spyOn(Model, 'deserialize').mockReturnValue(
+          Promise.resolve(mockDeserializedObject)
+        );
 
         return Model.fetch('123', { foo: 'bar' }).then((response) => {
-          expect(Model._constructBaseUrl.mock.calls.length).toBe(1);
-          expect(Model._constructBaseUrl.mock.calls[0][0]).toEqual({ foo: 'bar' });
+          expect(constructorBaseUrlSpy.mock.calls.length).toBe(1);
+          expect(constructorBaseUrlSpy.mock.calls[0][0]).toEqual({ foo: 'bar' });
 
-          expect(Model.adapter.get.mock.calls.length).toBe(1);
-          expect(Model.adapter.get.mock.calls[0]).toEqual(['/xyz/123', Model]);
+          expect(getSpy.mock.calls.length).toBe(1);
+          expect(getSpy.mock.calls[0]).toEqual(['/xyz/123']);
 
-          expect(response).toEqual(new Model({ id: '123' }));
+          expect(deserializeSpy).toHaveBeenCalledWith({ id: '123' });
+          expect(response).toEqual(mockDeserializedObject);
+
+          constructorBaseUrlSpy.mockRestore();
+          deserializeSpy.mockRestore();
         });
       });
     });
 
     describe('on failure', () => {
       test('it rejects the recieved response', () => {
-        Model.adapter = new JSONAPIAdapter();
+        Model.adapter = new HttpAdapter();
 
         Model.adapter.get = jest.fn().mockReturnValue(
           Promise.reject({
@@ -246,11 +279,11 @@ describe('Model', () => {
           })
         );
 
-        Model._constructBaseUrl = jest.fn().mockReturnValue('/xyz');
+        const constructorBaseUrlSpy = jest.spyOn(Model, '_constructBaseUrl').mockReturnValue('/xyz');
 
         return Model.fetch('123', { foo: 'bar' }).catch((response) => {
-          expect(Model._constructBaseUrl.mock.calls.length).toBe(1);
-          expect(Model._constructBaseUrl.mock.calls[0][0]).toEqual({ foo: 'bar' });
+          expect(constructorBaseUrlSpy.mock.calls.length).toBe(1);
+          expect(constructorBaseUrlSpy.mock.calls[0][0]).toEqual({ foo: 'bar' });
 
           expect(Model.adapter.get.mock.calls.length).toBe(1);
           expect(Model.adapter.get.mock.calls[0][0]).toEqual('/xyz/123');
@@ -259,6 +292,8 @@ describe('Model', () => {
             code: 404,
             status: 'Not Found'
           });
+
+          constructorBaseUrlSpy.mockRestore();
         });
       });
     });
@@ -277,7 +312,7 @@ describe('Model', () => {
 
     describe('on success', () => {
       test('it resolves to the recieved response', () => {
-        Model.adapter = new JSONAPIAdapter();
+        Model.adapter = new HttpAdapter();
 
         Model.adapter.delete = jest.fn().mockReturnValue(
           Promise.resolve({
@@ -305,7 +340,7 @@ describe('Model', () => {
 
     describe('on failure', () => {
       test('it rejects the recieved response', () => {
-        Model.adapter = new JSONAPIAdapter();
+        Model.adapter = new HttpAdapter();
 
         Model.adapter.delete = jest.fn().mockReturnValue(
           Promise.reject({
@@ -367,32 +402,51 @@ describe('Model', () => {
 
     describe('on success', () => {
       test('it resolves to an instance of the model', () => {
-        Model.adapter = new JSONAPIAdapter();
+        Model.adapter = new HttpAdapter();
 
-        Model.adapter.post = jest.fn().mockReturnValue(
-          Promise.resolve({
-            code: 201,
-            data: {
-              id: '123'
-            }
-          })
-        );
+        const mockResponse = {
+          code: 201,
+          data: {
+            id: '123'
+          }
+        };
+        Model.adapter.post = jest.fn().mockReturnValue(Promise.resolve(mockResponse));
 
         const model = new Model();
+
+        const mockSerializedObject = {
+          data: {
+            type: 'base',
+            id: 'kewm19j49'
+          }
+        };
+        const serializeSpy = jest.spyOn(model, 'serialize').mockReturnValue(mockSerializedObject);
+
+        const mockDeserializedObject = {
+          id: '123'
+        };
+        const deserializeSpy = jest.spyOn(Model, 'deserialize').mockReturnValue(
+          Promise.resolve(mockDeserializedObject)
+        );
 
         return model._create().then((response) => {
           expect(Model.adapter.post.mock.calls.length).toBe(1);
           expect(Model.adapter.post.mock.calls[0][0]).toBe(model.baseURL);
-          expect(Model.adapter.post.mock.calls[0][1]).toEqual(model);
+          expect(Model.adapter.post.mock.calls[0][1]).toEqual(mockSerializedObject);
 
-          expect(response).toEqual(new Model({ id: '123' }));
+          expect(serializeSpy).toHaveBeenCalled();
+          expect(deserializeSpy).toHaveBeenCalledWith(mockResponse.data);
+
+          expect(response).toEqual(mockDeserializedObject);
+
+          deserializeSpy.mockRestore();
         });
       });
     });
 
     describe('on failure', () => {
       test('it rejects the recieved response', () => {
-        Model.adapter = new JSONAPIAdapter();
+        Model.adapter = new HttpAdapter();
 
         Model.adapter.post = jest.fn().mockReturnValue(
           Promise.reject({
@@ -402,12 +456,16 @@ describe('Model', () => {
         );
 
         const model = new Model();
+        const serializeSpy = jest.spyOn(model, 'serialize').mockReturnValue({
+          foo: 'bar'
+        });
 
         return model._create().catch((response) => {
           expect(Model.adapter.post.mock.calls.length).toBe(1);
           expect(Model.adapter.post.mock.calls[0][0]).toBe(model.baseURL);
-          expect(Model.adapter.post.mock.calls[0][1]).toEqual(model);
+          expect(Model.adapter.post.mock.calls[0][1]).toEqual({ foo: 'bar' });
 
+          expect(serializeSpy).toHaveBeenCalled();
           expect(response).toEqual({
             code: 500,
             status: 'Internal Server Error'
@@ -424,34 +482,52 @@ describe('Model', () => {
 
     describe('on success', () => {
       test('it resolves to an instance of the model', () => {
-        Model.adapter = new JSONAPIAdapter();
+        Model.adapter = new HttpAdapter();
 
-        Model.adapter.patch = jest.fn().mockReturnValue(
-          Promise.resolve({
-            code: 200,
-            data: {
-              id: '123'
-            }
-          })
-        );
+        const mockResponse = {
+          code: 200,
+          data: {
+            id: '123'
+          }
+        };
 
+        Model.adapter.patch = jest.fn().mockReturnValue(Promise.resolve(mockResponse));
         const model = new Model({
           id: '123'
         });
 
+        const mockSerializedObject = {
+          data: {
+            type: 'base',
+            id: '123'
+          }
+        };
+        const serializeSpy = jest.spyOn(model, 'serialize').mockReturnValue(mockSerializedObject);
+
+        const mockDeserializedObject = {
+          id: '123'
+        };
+        const deserializeSpy = jest.spyOn(Model, 'deserialize').mockReturnValue(
+          Promise.resolve(mockDeserializedObject)
+        );
+
         return model._update().then((response) => {
           expect(Model.adapter.patch.mock.calls.length).toBe(1);
           expect(Model.adapter.patch.mock.calls[0][0]).toBe(`${model.baseURL}/123`);
-          expect(Model.adapter.patch.mock.calls[0][1]).toEqual(model);
+          expect(Model.adapter.patch.mock.calls[0][1]).toEqual(mockSerializedObject);
 
-          expect(response).toEqual(new Model({ id: '123' }));
+          expect(serializeSpy).toHaveBeenCalled();
+          expect(deserializeSpy).toHaveBeenCalledWith(mockResponse.data);
+          expect(response).toEqual(mockDeserializedObject);
+
+          deserializeSpy.mockRestore();
         });
       });
     });
 
     describe('on failure', () => {
       test('it rejects the recieved response', () => {
-        Model.adapter = new JSONAPIAdapter();
+        Model.adapter = new HttpAdapter();
 
         Model.adapter.patch = jest.fn().mockReturnValue(
           Promise.reject({
@@ -469,11 +545,20 @@ describe('Model', () => {
           id: '123'
         });
 
+        const mockSerializedObject = {
+          data: {
+            type: 'base',
+            id: '123'
+          }
+        };
+        const serializeSpy = jest.spyOn(model, 'serialize').mockReturnValue(mockSerializedObject);
+
         return model._update().catch((response) => {
           expect(Model.adapter.patch.mock.calls.length).toBe(1);
           expect(Model.adapter.patch.mock.calls[0][0]).toBe(`${model.baseURL}/123`);
-          expect(Model.adapter.patch.mock.calls[0][1]).toEqual(model);
+          expect(Model.adapter.patch.mock.calls[0][1]).toEqual(mockSerializedObject);
 
+          expect(serializeSpy).toHaveBeenCalled();
           expect(model._errors).toEqual(new JSONAPIError(response.data));
           expect(response).toEqual({
             code: 422,
@@ -496,7 +581,7 @@ describe('Model', () => {
 
     describe('on success', () => {
       test('it resolves to the recieved response', () => {
-        Model.adapter = new JSONAPIAdapter();
+        Model.adapter = new HttpAdapter();
 
         Model.adapter.delete = jest.fn().mockReturnValue(
           Promise.resolve({
@@ -523,7 +608,7 @@ describe('Model', () => {
 
     describe('on failure', () => {
       test('it rejects the recieved response', () => {
-        Model.adapter = new JSONAPIAdapter();
+        Model.adapter = new HttpAdapter();
 
         Model.adapter.delete = jest.fn().mockReturnValue(
           Promise.reject({
@@ -647,6 +732,63 @@ describe('Model', () => {
     test('it returns the right defaults', () => {
       expect(Model.deserializerOptions).toEqual({
         keyForAttribute: 'camelCase'
+      });
+    });
+  });
+
+  describe('#serialize()', () => {
+    test('it serializes the model', () => {
+      const model = new Model();
+      const optionsSpy = jest.spyOn(model, 'serializerOptions').mockReturnValue({
+        attributes: ['firstName', 'lastName']
+      });
+      expect(model.serialize()).toEqual({
+        data: {
+          type: 'users',
+          id: '123',
+          attributes: {
+            'first-name': 'John',
+            'last-name': 'Doe'
+          }
+        }
+      });
+      expect(optionsSpy).toHaveBeenCalled();
+      expect(JSONAPISerializer.Serializer.mock.instances.length).toBe(1);
+      expect(JSONAPISerializer.Serializer).toHaveBeenCalledWith('base', {
+        attributes: ['firstName', 'lastName']
+      });
+      expect(JSONAPISerializer.Serializer.prototype.serialize).toHaveBeenCalledWith(model);
+      optionsSpy.mockRestore();
+    });
+  });
+
+  describe('.deserialize(response)', () => {
+    test('it deserializes the response', () => {
+      class User extends Model {
+        constructor(args) {
+          super(args);
+          this.firstName = args.firstName;
+          this.lastName = args.lastName;
+        }
+      }
+
+      return User.deserialize({
+        data: {
+          type: 'users',
+          id: '123',
+          attributes: {
+            'first-name': 'John',
+            'last-name': 'Doe'
+          }
+        }
+      }).then((object) => {
+        expect(object).toEqual(new User({
+          id: '123',
+          firstName: 'John',
+          lastName: 'Doe'
+        }));
+        expect(JSONAPISerializer.Deserializer.mock.instances.length).toBe(1);
+        expect(JSONAPISerializer.Deserializer).toHaveBeenCalledWith(User.deserializerOptions);
       });
     });
   });

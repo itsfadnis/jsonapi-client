@@ -10,6 +10,26 @@ class HttpAdapter {
     };
   }
 
+  get(url) {
+    return this.request('GET', url);
+  }
+
+  post(url, data) {
+    return this.request('POST', url, data);
+  }
+
+  put(url, data) {
+    return this.request('PUT', url, data);
+  }
+
+  patch(url, data) {
+    return this.request('PATCH', url, data);
+  }
+
+  delete(url) {
+    return this.request('DELETE', url);
+  }
+
   request(method, url, data) {
     const request = new Request(this.baseURL + this.namespace + url, {
       method,

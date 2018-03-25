@@ -1,11 +1,13 @@
 var Deserializer = jest.fn();
 var Serializer = jest.fn();
 
-Deserializer.prototype.deserialize = jest.fn().mockReturnValue({
-  id: '123',
-  firstName: 'John',
-  lastName: 'Doe'
-});
+Deserializer.prototype.deserialize = jest.fn().mockReturnValue(
+  Promise.resolve({
+    id: '123',
+    firstName: 'John',
+    lastName: 'Doe'
+  })
+);
 
 Serializer.prototype.serialize = jest.fn().mockReturnValue({
   data: {

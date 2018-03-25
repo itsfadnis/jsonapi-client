@@ -1,4 +1,4 @@
 module.exports = {
-  JSONAPIAdapter: require('./jsonapi-adapter'),
+  HttpAdapter: require('./http-adapter'),
   Model: require('./model')
 };

@@ -1,4 +1,5 @@
 const Errors = require('./jsonapi-error');
+const { Serializer, Deserializer } = require('jsonapi-serializer');
 
 class Base {
   static baseURL = '';
@@ -97,6 +98,19 @@ class Base {
     return relationships;
   }
 
+  serialize() {
+    return new Serializer(
+      this.constructor.name.toLowerCase(),
+      this.serializerOptions()
+    ).serialize(this);
+  }
+
+  static deserialize(response) {
+    return new Deserializer(this.deserializerOptions)
+      .deserialize(response)
+      .then(object => new this(object));
+  }
+
   get errors() {
     return this._errors;
   }
@@ -125,22 +139,25 @@ class Base {
 
   static fetch(id, args = {}) {
     return this.adapter
-      .get(`${ this._constructBaseUrl(args) }/${ id }`, this)
-      .then(({ data }) => this.new(data))
+      .get(`${ this._constructBaseUrl(args) }/${ id }`)
+      .then(({ data }) => this.deserialize(data))
+      .then(object => object)
       .catch((err) => { throw err; });
   }
 
   static fetchAll(args = {}) {
     return this.adapter
-      .get(`${ this._constructBaseUrl(args) }`, this)
-      .then(({ data }) => data.map((object) => this.new(object)))
+      .get(`${ this._constructBaseUrl(args) }`)
+      .then(({ data }) => this.deserialize(data))
+      .then(array => array)
       .catch((err) => { throw err; });
   }
 
   _create() {
     return this.constructor.adapter
-      .post(this.baseURL, this)
-      .then(({ data }) => this.constructor.new(data))
+      .post(this.baseURL, this.serialize())
+      .then(({ data }) => this.constructor.deserialize(data))
+      .then(object => object)
       .catch((err) => {
         if (err.code === 422) this._process422Response(err);
         throw err;
@@ -149,8 +166,9 @@ class Base {
 
   _update() {
     return this.constructor.adapter
-      .patch(`${ this.baseURL }/${ this.id }`, this)
-      .then(({ data }) => this.constructor.new(data))
+      .patch(`${ this.baseURL }/${ this.id }`, this.serialize())
+      .then(({ data }) => this.constructor.deserialize(data))
+      .then(object => object)
       .catch((err) => {
         if (err.code === 422) this._process422Response(err);
         throw err;
