@@ -29,8 +29,8 @@ class Base {
   serializerOptions() {
     let object = {};
 
-    const attributes = this.attributes;
-    const relationships = this.relationships;
+    const attributes = this.attributes();
+    const relationships = this.relationships();
 
     object.attributes = [
       ...Object.keys(attributes),
@@ -41,7 +41,7 @@ class Base {
       if (relationships.hasOwnProperty(key)) {
         object[key] = {
           ref: 'id',
-          attributes: relationships[key].attributes
+          attributes: relationships[key].attributes()
         };
       }
     }
@@ -74,7 +74,7 @@ class Base {
       && typeof this[key] === 'object';
   }
 
-  get attributes() {
+  attributes() {
     let attributes = {};
 
     for (let key in this) {
@@ -86,7 +86,7 @@ class Base {
     return attributes;
   }
 
-  get relationships() {
+  relationships() {
     let relationships = {};
 
     for (let key in this) {

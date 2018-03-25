@@ -28,7 +28,7 @@ describe('Model', () => {
     });
   });
 
-  describe('#attributes', () => {
+  describe('#attributes()', () => {
     test('it returns model attributes', () => {
       const model = new Model({
         id: '123'
@@ -45,7 +45,7 @@ describe('Model', () => {
       };
       model.arrayFoo = ['foo'];
 
-      expect(model.attributes).toEqual({
+      expect(model.attributes()).toEqual({
         id: '123',
         foo: 'foo',
         bar: 'bar'
@@ -53,7 +53,7 @@ describe('Model', () => {
     });
   });
 
-  describe('#relationships', () => {
+  describe('#relationships()', () => {
     test('it returns model relationships', () => {
       const model = new Model();
 
@@ -67,7 +67,7 @@ describe('Model', () => {
       };
       model.arrayFoo = ['foo'];
 
-      expect(model.relationships).toEqual({
+      expect(model.relationships()).toEqual({
         objectFoo: {
           foo: 'bar'
         },
@@ -700,17 +700,17 @@ describe('Model', () => {
     test('it returns the right options', () => {
       const model = new Model();
 
-      const attributesSpy = jest.spyOn(model, 'attributes', 'get').mockReturnValue({
+      const attributesSpy = jest.spyOn(model, 'attributes').mockReturnValue({
         firstName: 'John',
         lastName: 'Doe'
       });
 
-      const relationshipsSpy = jest.spyOn(model, 'relationships', 'get').mockReturnValue({
+      const relationshipsSpy = jest.spyOn(model, 'relationships').mockReturnValue({
         address: {
           type: 'work',
           street: 'Dogwood Way',
           zip: '12345',
-          get attributes() {
+          attributes() {
             return ['type', 'street', 'zip'];
           }
         }
