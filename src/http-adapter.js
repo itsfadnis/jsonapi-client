@@ -30,48 +30,37 @@ class HttpAdapter {
     return this.request('DELETE', url);
   }
 
+  extractResponseHeaders(response) {
+    let object = {};
+    for (const [key, value] of response.headers.entries()) {
+      object[key] = value;
+    }
+    return object;
+  }
+
   request(method, url, data) {
     const request = new Request(this.baseURL + this.namespace + url, {
       method,
       headers: this.headers,
-      // Set body if method is POST, PUT, PATCH, not applicable for GET, DELETE
-      body: ['POST', 'PUT', 'PATCH'].indexOf(method) > -1 ? JSON.stringify(data) : null
+      body: data && JSON.stringify(data)
     });
 
     return fetch(request).then((response) => {
-      return this._parseResponse(response).then((json) => {
-        if (response.ok) {
-          return json;
-        }
-        throw json;
+      const payload = {
+        status: response.status,
+        statusText: response.statusText,
+        headers: this.extractResponseHeaders(response)
+      };
+      if (!response.ok) { throw payload; }
+
+      return response.json().then((json) => {
+        return {
+          ...payload,
+          data: json
+        };
+      }).catch(() => {
+        return payload;
       });
-    });
-  }
-
-  _parseResponse(response) {
-    let responseHeaders = {};
-
-    for (let [ key, value ] of response.headers.entries()) {
-      responseHeaders[key] = value;
-    }
-
-    let responsePayload = {
-      code: response.status,
-      status: response.statusText,
-      headers: responseHeaders
-    };
-
-    return response.text().then((text) => {
-      let parseFail = false;
-      let json;
-      try {
-        json = JSON.parse(text);
-      } catch (e) {
-        parseFail = true;
-      } finally {
-        responsePayload.data = parseFail ? null : json;
-        return responsePayload;
-      }
     });
   }
 }
