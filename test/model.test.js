@@ -46,7 +46,6 @@ describe('Model', () => {
       model.arrayFoo = ['foo'];
 
       expect(model.attributes()).toEqual({
-        id: '123',
         foo: 'foo',
         bar: 'bar'
       });

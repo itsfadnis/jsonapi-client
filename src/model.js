@@ -63,6 +63,7 @@ class Base {
 
   _isAttribute(key) {
     return this.hasOwnProperty(key)
+      && key !== 'id'
       && !this._isPrivate(key)
       && typeof this[key] !== 'function'
       && typeof this[key] !== 'object';
