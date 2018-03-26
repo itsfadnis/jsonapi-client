@@ -14,7 +14,7 @@ class Base {
     return this.baseURL.match(/:[a-z_]+/g);
   }
 
-  static _constructBaseUrl(args) {
+  static constructBaseURL(args) {
     const urlParams = this._urlParams();
     if (!urlParams) return this.baseURL;
 
@@ -24,6 +24,10 @@ class Base {
     });
 
     return url;
+  }
+
+  constructBaseURL(args) {
+    return this.constructor.constructBaseURL(args);
   }
 
   serializerOptions() {
@@ -52,10 +56,6 @@ class Base {
   static deserializerOptions = {
     keyForAttribute: 'camelCase'
   };
-
-  get baseURL() {
-    return this.constructor._constructBaseUrl();
-  }
 
   _isPrivate(member) {
     return member.charAt(0) === '_';
@@ -140,7 +140,7 @@ class Base {
 
   static fetch(id, args = {}) {
     return this.adapter
-      .get(`${ this._constructBaseUrl(args) }/${ id }`)
+      .get(`${ this.constructBaseURL(args) }/${ id }`)
       .then(({ data }) => this.deserialize(data))
       .then(object => object)
       .catch((err) => { throw err; });
@@ -148,7 +148,7 @@ class Base {
 
   static fetchAll(args = {}) {
     return this.adapter
-      .get(`${ this._constructBaseUrl(args) }`)
+      .get(`${ this.constructBaseURL(args) }`)
       .then(({ data }) => this.deserialize(data))
       .then(array => array)
       .catch((err) => { throw err; });
@@ -156,7 +156,7 @@ class Base {
 
   _create() {
     return this.constructor.adapter
-      .post(this.baseURL, this.serialize())
+      .post(this.constructBaseURL(), this.serialize())
       .then(({ data }) => this.constructor.deserialize(data))
       .then(object => object)
       .catch((err) => {
@@ -167,7 +167,7 @@ class Base {
 
   _update() {
     return this.constructor.adapter
-      .patch(`${ this.baseURL }/${ this.id }`, this.serialize())
+      .patch(`${ this.constructBaseURL() }/${ this.id }`, this.serialize())
       .then(({ data }) => this.constructor.deserialize(data))
       .then(object => object)
       .catch((err) => {
@@ -182,13 +182,13 @@ class Base {
 
   static destroy(id, args = {}) {
     return this.adapter
-      .delete(`${ this._constructBaseUrl(args) }/${ id }`)
+      .delete(`${ this.constructBaseURL(args) }/${ id }`)
       .catch((err) => { throw err; });
   }
 
   destroy() {
     return this.constructor.adapter
-      .delete(`${ this.baseURL }/${ this.id }`)
+      .delete(`${ this.constructor.constructBaseURL() }/${ this.id }`)
       .catch((err) => { throw err; });
   }
 

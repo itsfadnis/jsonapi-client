@@ -157,7 +157,7 @@ describe('Model', () => {
           }]
         };
 
-        const constructorBaseUrlSpy = jest.spyOn(Model, '_constructBaseUrl').mockReturnValue('/xyz');
+        const constructBaseURLSpy = jest.spyOn(Model, 'constructBaseURL').mockReturnValue('/xyz');
         const getSpy = jest.spyOn(Model.adapter, 'get').mockReturnValue(
           Promise.resolve(mockResponse)
         );
@@ -181,8 +181,8 @@ describe('Model', () => {
         return Model.fetchAll({
           foo: 'bar'
         }).then((response) => {
-          expect(constructorBaseUrlSpy.mock.calls.length).toBe(1);
-          expect(constructorBaseUrlSpy.mock.calls[0][0]).toEqual({ foo: 'bar' });
+          expect(constructBaseURLSpy.mock.calls.length).toBe(1);
+          expect(constructBaseURLSpy.mock.calls[0][0]).toEqual({ foo: 'bar' });
 
           expect(getSpy.mock.calls.length).toBe(1);
           expect(getSpy.mock.calls[0][0]).toEqual('/xyz');
@@ -192,7 +192,7 @@ describe('Model', () => {
 
           deserializeSpy.mockRestore();
           getSpy.mockRestore();
-          constructorBaseUrlSpy.mockRestore();
+          constructBaseURLSpy.mockRestore();
         });
       });
     });
@@ -207,13 +207,13 @@ describe('Model', () => {
         };
 
         const getSpy = jest.spyOn(Model.adapter, 'get').mockReturnValue(Promise.reject(mockResponse));
-        const constructorBaseUrlSpy = jest.spyOn(Model, '_constructBaseUrl').mockReturnValue('/xyz');
+        const constructBaseURLSpy = jest.spyOn(Model, 'constructBaseURL').mockReturnValue('/xyz');
 
         return Model.fetchAll({
           foo: 'bar'
         }).catch((response) => {
-          expect(constructorBaseUrlSpy.mock.calls.length).toBe(1);
-          expect(constructorBaseUrlSpy.mock.calls[0][0]).toEqual({ foo: 'bar' });
+          expect(constructBaseURLSpy.mock.calls.length).toBe(1);
+          expect(constructBaseURLSpy.mock.calls[0][0]).toEqual({ foo: 'bar' });
 
           expect(getSpy.mock.calls.length).toBe(1);
           expect(getSpy.mock.calls[0][0]).toEqual('/xyz');
@@ -221,7 +221,7 @@ describe('Model', () => {
           expect(response).toEqual(mockResponse);
 
           getSpy.mockRestore();
-          constructorBaseUrlSpy.mockRestore();
+          constructBaseURLSpy.mockRestore();
         });
       });
     });
@@ -236,7 +236,7 @@ describe('Model', () => {
       test('it resolves to an instance of the model', () => {
         Model.adapter = new HttpAdapter();
 
-        const constructorBaseUrlSpy = jest.spyOn(Model, '_constructBaseUrl').mockReturnValue('/xyz');
+        const constructBaseURLSpy = jest.spyOn(Model, 'constructBaseURL').mockReturnValue('/xyz');
         const getSpy = jest.spyOn(Model.adapter, 'get').mockReturnValue(
           Promise.resolve({
             code: 200,
@@ -252,8 +252,8 @@ describe('Model', () => {
         );
 
         return Model.fetch('123', { foo: 'bar' }).then((response) => {
-          expect(constructorBaseUrlSpy.mock.calls.length).toBe(1);
-          expect(constructorBaseUrlSpy.mock.calls[0][0]).toEqual({ foo: 'bar' });
+          expect(constructBaseURLSpy.mock.calls.length).toBe(1);
+          expect(constructBaseURLSpy.mock.calls[0][0]).toEqual({ foo: 'bar' });
 
           expect(getSpy.mock.calls.length).toBe(1);
           expect(getSpy.mock.calls[0]).toEqual(['/xyz/123']);
@@ -261,7 +261,7 @@ describe('Model', () => {
           expect(deserializeSpy).toHaveBeenCalledWith({ id: '123' });
           expect(response).toEqual(mockDeserializedObject);
 
-          constructorBaseUrlSpy.mockRestore();
+          constructBaseURLSpy.mockRestore();
           deserializeSpy.mockRestore();
         });
       });
@@ -278,11 +278,11 @@ describe('Model', () => {
           })
         );
 
-        const constructorBaseUrlSpy = jest.spyOn(Model, '_constructBaseUrl').mockReturnValue('/xyz');
+        const constructBaseURLSpy = jest.spyOn(Model, 'constructBaseURL').mockReturnValue('/xyz');
 
         return Model.fetch('123', { foo: 'bar' }).catch((response) => {
-          expect(constructorBaseUrlSpy.mock.calls.length).toBe(1);
-          expect(constructorBaseUrlSpy.mock.calls[0][0]).toEqual({ foo: 'bar' });
+          expect(constructBaseURLSpy.mock.calls.length).toBe(1);
+          expect(constructBaseURLSpy.mock.calls[0][0]).toEqual({ foo: 'bar' });
 
           expect(Model.adapter.get.mock.calls.length).toBe(1);
           expect(Model.adapter.get.mock.calls[0][0]).toEqual('/xyz/123');
@@ -292,21 +292,15 @@ describe('Model', () => {
             status: 'Not Found'
           });
 
-          constructorBaseUrlSpy.mockRestore();
+          constructBaseURLSpy.mockRestore();
         });
       });
     });
   });
 
   describe('.destroy(id, args)', () => {
-    let _constructBaseUrl;
-    beforeEach(() => {
-      _constructBaseUrl = Model._constructBaseUrl;
-    });
-
     afterEach(() => {
       delete Model.adapter;
-      Model._constructBaseUrl = _constructBaseUrl;
     });
 
     describe('on success', () => {
@@ -320,19 +314,16 @@ describe('Model', () => {
           })
         );
 
-        Model._constructBaseUrl = jest.fn().mockReturnValue('/xyz');
+        const constructBaseURLSpy = jest.spyOn(Model, 'constructBaseURL').mockReturnValue('/xyz');
 
         return Model.destroy('123', { foo: 'bar' }).then((response) => {
-          expect(Model._constructBaseUrl.mock.calls.length).toBe(1);
-          expect(Model._constructBaseUrl.mock.calls[0][0]).toEqual({ foo: 'bar' });
-
-          expect(Model.adapter.delete.mock.calls.length).toBe(1);
+          expect(constructBaseURLSpy.mock.calls[0][0]).toEqual({ foo: 'bar' });
           expect(Model.adapter.delete.mock.calls[0][0]).toEqual('/xyz/123');
-
           expect(response).toEqual({
             code: 200,
             status: 'OK'
           });
+          constructBaseURLSpy.mockRestore();
         });
       });
     });
@@ -348,19 +339,16 @@ describe('Model', () => {
           })
         );
 
-        Model._constructBaseUrl = jest.fn().mockReturnValue('/xyz');
+        const constructBaseURLSpy = jest.spyOn(Model, 'constructBaseURL').mockReturnValue('/xyz');
 
         return Model.destroy('123', { foo: 'bar' }).catch((response) => {
-          expect(Model._constructBaseUrl.mock.calls.length).toBe(1);
-          expect(Model._constructBaseUrl.mock.calls[0][0]).toEqual({ foo: 'bar' });
-
-          expect(Model.adapter.delete.mock.calls.length).toBe(1);
+          expect(constructBaseURLSpy.mock.calls[0][0]).toEqual({ foo: 'bar' });
           expect(Model.adapter.delete.mock.calls[0][0]).toEqual('/xyz/123');
-
           expect(response).toEqual({
             code: 404,
             status: 'Not Found'
           });
+          constructBaseURLSpy.mockRestore();
         });
       });
     });
@@ -430,7 +418,7 @@ describe('Model', () => {
 
         return model._create().then((response) => {
           expect(Model.adapter.post.mock.calls.length).toBe(1);
-          expect(Model.adapter.post.mock.calls[0][0]).toBe(model.baseURL);
+          expect(Model.adapter.post.mock.calls[0][0]).toBe(model.constructBaseURL());
           expect(Model.adapter.post.mock.calls[0][1]).toEqual(mockSerializedObject);
 
           expect(serializeSpy).toHaveBeenCalled();
@@ -461,7 +449,7 @@ describe('Model', () => {
 
         return model._create().catch((response) => {
           expect(Model.adapter.post.mock.calls.length).toBe(1);
-          expect(Model.adapter.post.mock.calls[0][0]).toBe(model.baseURL);
+          expect(Model.adapter.post.mock.calls[0][0]).toBe(model.constructBaseURL());
           expect(Model.adapter.post.mock.calls[0][1]).toEqual({ foo: 'bar' });
 
           expect(serializeSpy).toHaveBeenCalled();
@@ -512,7 +500,7 @@ describe('Model', () => {
 
         return model._update().then((response) => {
           expect(Model.adapter.patch.mock.calls.length).toBe(1);
-          expect(Model.adapter.patch.mock.calls[0][0]).toBe(`${model.baseURL}/123`);
+          expect(Model.adapter.patch.mock.calls[0][0]).toBe(`${ model.constructBaseURL() }/123`);
           expect(Model.adapter.patch.mock.calls[0][1]).toEqual(mockSerializedObject);
 
           expect(serializeSpy).toHaveBeenCalled();
@@ -554,7 +542,7 @@ describe('Model', () => {
 
         return model._update().catch((response) => {
           expect(Model.adapter.patch.mock.calls.length).toBe(1);
-          expect(Model.adapter.patch.mock.calls[0][0]).toBe(`${model.baseURL}/123`);
+          expect(Model.adapter.patch.mock.calls[0][0]).toBe(`${ model.constructBaseURL() }/123`);
           expect(Model.adapter.patch.mock.calls[0][1]).toEqual(mockSerializedObject);
 
           expect(serializeSpy).toHaveBeenCalled();
@@ -593,14 +581,16 @@ describe('Model', () => {
           id: '123'
         });
 
-        return model.destroy().then((response) => {
-          expect(Model.adapter.delete.mock.calls.length).toBe(1);
-          expect(Model.adapter.delete.mock.calls[0][0]).toBe(`${model.baseURL}/123`);
+        const constructBaseURLSpy = jest.spyOn(Model, 'constructBaseURL').mockReturnValue('/xyz');
 
+        return model.destroy().then((response) => {
+          expect(Model.adapter.delete.mock.calls[0][0]).toBe('/xyz/123');
+          expect(constructBaseURLSpy).toHaveBeenCalled();
           expect(response).toEqual({
             code: 200,
             status: 'OK'
           });
+          constructBaseURLSpy.mockRestore();
         });
       });
     });
@@ -620,14 +610,16 @@ describe('Model', () => {
           id: '123'
         });
 
-        return model.destroy().catch((response) => {
-          expect(Model.adapter.delete.mock.calls.length).toBe(1);
-          expect(Model.adapter.delete.mock.calls[0][0]).toBe(`${model.baseURL}/123`);
+        const constructBaseURLSpy = jest.spyOn(Model, 'constructBaseURL').mockReturnValue('/xyz');
 
+        return model.destroy().catch((response) => {
+          expect(Model.adapter.delete.mock.calls[0][0]).toBe('/xyz/123');
+          expect(constructBaseURLSpy).toHaveBeenCalled();
           expect(response).toEqual({
             code: 404,
             status: 'Not Found'
           });
+          constructBaseURLSpy.mockRestore();
         });
       });
     });
@@ -658,21 +650,7 @@ describe('Model', () => {
     });
   });
 
-  describe('#baseURL', () => {
-    test('it returns ._constructBaseUrl()', () => {
-      const model = new Model();
-
-      const spy = jest.spyOn(Model, '_constructBaseUrl').mockReturnValue('/xyz');
-
-      expect(model.baseURL).toBe('/xyz');
-      expect(spy).toHaveBeenCalled();
-
-      spy.mockReset();
-      spy.mockRestore();
-    });
-  });
-
-  describe('._constructBaseUrl(args)', () => {
+  describe('.constructBaseURL(args)', () => {
     afterEach(() => {
       Model.baseURL = '';
     });
@@ -680,18 +658,28 @@ describe('Model', () => {
     describe('with no args', () => {
       test('it returns the right url ', () => {
         Model.baseURL = '/foo/bar';
-        expect(Model._constructBaseUrl()).toBe('/foo/bar');
+        expect(Model.constructBaseURL()).toBe('/foo/bar');
       });
     });
 
     describe('with args', () => {
       test('it returns the right url', () => {
         Model.baseURL = '/posts/:post_id/comments/:comment_id/likes';
-        expect(Model._constructBaseUrl({
+        expect(Model.constructBaseURL({
           post_id: 101,
           comment_id: 234
         })).toBe('/posts/101/comments/234/likes');
       });
+    });
+  });
+
+  describe('#constructBaseURL()', () => {
+    test('it calls & returns .constructBaseURL()', () => {
+      const spy = jest.spyOn(Model, 'constructBaseURL').mockReturnValue('/xyz');
+      const model = new Model();
+      expect(model.constructBaseURL()).toBe('/xyz');
+      expect(spy).toHaveBeenCalled();
+      spy.mockRestore();
     });
   });
 
