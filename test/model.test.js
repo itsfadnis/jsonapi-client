@@ -139,7 +139,7 @@ describe('Model', () => {
         Model.adapter = new HttpAdapter();
 
         const mockResponse = {
-          code: 200,
+          status: 200,
           data: [{
             type: 'users',
             id: '123',
@@ -202,8 +202,8 @@ describe('Model', () => {
         Model.adapter = new HttpAdapter();
 
         const mockResponse = {
-          code: 500,
-          status: 'Internal Server Error'
+          status: 500,
+          statusText: 'Internal Server Error'
         };
 
         const getSpy = jest.spyOn(Model.adapter, 'get').mockReturnValue(Promise.reject(mockResponse));
@@ -239,7 +239,7 @@ describe('Model', () => {
         const constructBaseURLSpy = jest.spyOn(Model, 'constructBaseURL').mockReturnValue('/xyz');
         const getSpy = jest.spyOn(Model.adapter, 'get').mockReturnValue(
           Promise.resolve({
-            code: 200,
+            status: 200,
             data: {
               id: '123'
             }
@@ -273,8 +273,8 @@ describe('Model', () => {
 
         Model.adapter.get = jest.fn().mockReturnValue(
           Promise.reject({
-            code: 404,
-            status: 'Not Found'
+            status: 404,
+            statusText: 'Not Found'
           })
         );
 
@@ -288,8 +288,8 @@ describe('Model', () => {
           expect(Model.adapter.get.mock.calls[0][0]).toEqual('/xyz/123');
 
           expect(response).toEqual({
-            code: 404,
-            status: 'Not Found'
+            status: 404,
+            statusText: 'Not Found'
           });
 
           constructBaseURLSpy.mockRestore();
@@ -309,8 +309,8 @@ describe('Model', () => {
 
         Model.adapter.delete = jest.fn().mockReturnValue(
           Promise.resolve({
-            code: 200,
-            status: 'OK'
+            status: 200,
+            statusText: 'OK'
           })
         );
 
@@ -320,8 +320,8 @@ describe('Model', () => {
           expect(constructBaseURLSpy.mock.calls[0][0]).toEqual({ foo: 'bar' });
           expect(Model.adapter.delete.mock.calls[0][0]).toEqual('/xyz/123');
           expect(response).toEqual({
-            code: 200,
-            status: 'OK'
+            status: 200,
+            statusText: 'OK'
           });
           constructBaseURLSpy.mockRestore();
         });
@@ -334,8 +334,8 @@ describe('Model', () => {
 
         Model.adapter.delete = jest.fn().mockReturnValue(
           Promise.reject({
-            code: 404,
-            status: 'Not Found'
+            status: 404,
+            statusText: 'Not Found'
           })
         );
 
@@ -345,8 +345,8 @@ describe('Model', () => {
           expect(constructBaseURLSpy.mock.calls[0][0]).toEqual({ foo: 'bar' });
           expect(Model.adapter.delete.mock.calls[0][0]).toEqual('/xyz/123');
           expect(response).toEqual({
-            code: 404,
-            status: 'Not Found'
+            status: 404,
+            statusText: 'Not Found'
           });
           constructBaseURLSpy.mockRestore();
         });
@@ -392,7 +392,7 @@ describe('Model', () => {
         Model.adapter = new HttpAdapter();
 
         const mockResponse = {
-          code: 201,
+          status: 201,
           data: {
             id: '123'
           }
@@ -437,8 +437,8 @@ describe('Model', () => {
 
         Model.adapter.post = jest.fn().mockReturnValue(
           Promise.reject({
-            code: 500,
-            status: 'Internal Server Error'
+            status: 500,
+            statusText: 'Internal Server Error'
           })
         );
 
@@ -454,8 +454,8 @@ describe('Model', () => {
 
           expect(serializeSpy).toHaveBeenCalled();
           expect(response).toEqual({
-            code: 500,
-            status: 'Internal Server Error'
+            status: 500,
+            statusText: 'Internal Server Error'
           });
         });
       });
@@ -472,7 +472,7 @@ describe('Model', () => {
         Model.adapter = new HttpAdapter();
 
         const mockResponse = {
-          code: 200,
+          status: 200,
           data: {
             id: '123'
           }
@@ -518,8 +518,8 @@ describe('Model', () => {
 
         Model.adapter.patch = jest.fn().mockReturnValue(
           Promise.reject({
-            code: 422,
-            status: 'Unprocessable Entity',
+            status: 422,
+            statusText: 'Unprocessable Entity',
             data: {
               errors: [{
                 code: 'invalid'
@@ -539,17 +539,18 @@ describe('Model', () => {
           }
         };
         const serializeSpy = jest.spyOn(model, 'serialize').mockReturnValue(mockSerializedObject);
+        const process422ResponseSpy = jest.spyOn(model, '_process422Response');
 
         return model._update().catch((response) => {
           expect(Model.adapter.patch.mock.calls.length).toBe(1);
           expect(Model.adapter.patch.mock.calls[0][0]).toBe(`${ model.constructBaseURL() }/123`);
           expect(Model.adapter.patch.mock.calls[0][1]).toEqual(mockSerializedObject);
-
+          expect(process422ResponseSpy).toHaveBeenCalledWith(response);
           expect(serializeSpy).toHaveBeenCalled();
           expect(model._errors).toEqual(new JSONAPIError(response.data));
           expect(response).toEqual({
-            code: 422,
-            status: 'Unprocessable Entity',
+            status: 422,
+            statusText: 'Unprocessable Entity',
             data: {
               errors: [{
                 code: 'invalid'
@@ -572,8 +573,8 @@ describe('Model', () => {
 
         Model.adapter.delete = jest.fn().mockReturnValue(
           Promise.resolve({
-            code: 200,
-            status: 'OK'
+            status: 200,
+            statusText: 'OK'
           })
         );
 
@@ -587,8 +588,8 @@ describe('Model', () => {
           expect(Model.adapter.delete.mock.calls[0][0]).toBe('/xyz/123');
           expect(constructBaseURLSpy).toHaveBeenCalled();
           expect(response).toEqual({
-            code: 200,
-            status: 'OK'
+            status: 200,
+            statusText: 'OK'
           });
           constructBaseURLSpy.mockRestore();
         });
@@ -601,8 +602,8 @@ describe('Model', () => {
 
         Model.adapter.delete = jest.fn().mockReturnValue(
           Promise.reject({
-            code: 404,
-            status: 'Not Found'
+            status: 404,
+            statusText: 'Not Found'
           })
         );
 
@@ -616,8 +617,8 @@ describe('Model', () => {
           expect(Model.adapter.delete.mock.calls[0][0]).toBe('/xyz/123');
           expect(constructBaseURLSpy).toHaveBeenCalled();
           expect(response).toEqual({
-            code: 404,
-            status: 'Not Found'
+            status: 404,
+            statusText: 'Not Found'
           });
           constructBaseURLSpy.mockRestore();
         });
