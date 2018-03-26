@@ -160,7 +160,7 @@ class Base {
       .then(({ data }) => this.constructor.deserialize(data))
       .then(object => object)
       .catch((err) => {
-        if (err.code === 422) this._process422Response(err);
+        if (err.status === 422) this._process422Response(err);
         throw err;
       });
   }
@@ -171,7 +171,7 @@ class Base {
       .then(({ data }) => this.constructor.deserialize(data))
       .then(object => object)
       .catch((err) => {
-        if (err.code === 422) this._process422Response(err);
+        if (err.status === 422) this._process422Response(err);
         throw err;
       });
   }
