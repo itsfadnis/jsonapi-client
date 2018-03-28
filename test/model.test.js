@@ -308,6 +308,12 @@ describe('Model', () => {
   });
 
   describe('#save()', () => {
+    describe('on invalid model', () => {
+      const model = new Model();
+      jest.spyOn(model, 'valid', 'get').mockReturnValue(false);
+      expect(model.save()).rejects.toEqual(new Error('Unprocessable Entity'));
+    });
+
     describe('on persisted model', () => {
       test('it calls & returns #_update()', () => {
         const model = new Model();

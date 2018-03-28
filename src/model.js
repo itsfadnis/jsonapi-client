@@ -219,6 +219,8 @@ class Base {
   }
 
   save() {
+    if (!this.valid) return Promise.reject(new Error('Unprocessable Entity'));
+
     return this.persisted ? this._update() : this._create();
   }
 
