@@ -150,7 +150,12 @@ class Base {
   static deserialize(response) {
     return new Deserializer(this.deserializerOptions)
       .deserialize(response)
-      .then(object => new this(object));
+      .then((data) => {
+        if (Array.isArray(data)) {
+          return data.map(object => new this(object));
+        }
+        return new this(data);
+      });
   }
 
   get valid() {
