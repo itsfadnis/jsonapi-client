@@ -49,6 +49,58 @@ Default deserializer options are defined on the static property `Model.deseriali
 ### Model definition
 
 ```javascript
+class Address extends Model {
+  // Always set the base url of your resource on this property
+  static baseURL = '/addresses';
+
+  constructor(args = {}) {
+    super(args);
+    this.type = args.type;
+    this.street = args.street;
+    this.zip = args.zip;
+  }
+}
+
+class DriversLicense extends Model {
+  // Specify url parameters for nested resources
+  static baseURL = '/people/:person_id/drivers_license';
+
+  constructor(args = {}) {
+    super(args);
+    this.licenseNumber = args.licenseNumber;
+
+    // Drivers license belongs to person
+    this.person = this.belongsTo(Person, args.person);
+  }
+
+  // Resolve base url for nested resources in the #contructBaseURL() method
+  constructBaseURL() {
+    return this.constructor.constructBaseURL({
+      person_id: this.person.id
+    });
+  }
+}
+
+class Person extends Model {
+  static baseURL = '/people';
+
+  constructor(args = {}) {
+    super(args);
+    this.firstName = args.firstName || '';
+    this.lastName = args.lastName;
+
+    // Person has many addresses
+    this.addresses = this.hasMany(Address, args.addresses);
+
+    // Person has one drivers license
+    this.driversLicense = this.hasOne(DriversLicense, args.driversLicense);
+  }
+}
+```
+
+#### Standard CRUD APIs
+
+```javascript
 class Post extends Model {
   static baseURL = '/posts';
 
@@ -59,8 +111,6 @@ class Post extends Model {
   }
 }
 ```
-
-#### Standard CRUD APIs
 
 - Fetch posts
 ```javascript
