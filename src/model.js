@@ -6,7 +6,8 @@ class Base {
 
   static symbols = {
     errors: Symbol('errors'),
-    persisted: Symbol('persisted')
+    persisted: Symbol('persisted'),
+    relationship: Symbol('relationship')
   };
 
   constructor(args = {}) {
@@ -19,6 +20,24 @@ class Base {
 
     this[errors] = new Errors();
     this[persisted] = !!args.id;
+  }
+
+  hasMany(Thing, array = []) {
+    const things = array.map(object => new Thing(object));
+    things[this.constructor.symbols.relationship] = Thing;
+    return things;
+  }
+
+  belongsTo(Thing, object) {
+    const thing = new Thing(object);
+    thing[this.constructor.symbols.relationship] = Thing;
+    return thing;
+  }
+
+  hasOne(Thing, object) {
+    const thing = new Thing(object);
+    thing[this.constructor.symbols.relationship] = Thing;
+    return thing;
   }
 
   get errors() {
@@ -35,6 +54,44 @@ class Base {
 
   set persisted(persisted) {
     this[this.constructor.symbols.persisted] = persisted;
+  }
+
+  isRelationship(key) {
+    return this.hasOwnProperty(key)
+      && Object.getOwnPropertySymbols(this[key] || {}).indexOf(
+        this.constructor.symbols.relationship
+      ) > -1;
+  }
+
+  isAttribute(key) {
+    return this.hasOwnProperty(key)
+      && key !== 'id'
+      && typeof key !== 'function'
+      && Object.getOwnPropertySymbols(this[key] || {}).indexOf(
+        this.constructor.symbols.relationship
+      ) === -1;
+  }
+
+  static keysForAttributes() {
+    const model = this.new();
+    let keys = [];
+    for (const key in model) {
+      if (this.prototype.isAttribute.call(model, key)) {
+        keys.push(key);
+      }
+    }
+    return keys;
+  }
+
+  static keysForRelationships() {
+    const model = this.new();
+    let keys = [];
+    for (const key in model) {
+      if (this.prototype.isRelationship.call(model, key)) {
+        keys.push(key);
+      }
+    }
+    return keys;
   }
 
   static _urlParams() {
@@ -60,22 +117,21 @@ class Base {
   serializerOptions() {
     let object = {};
 
-    const attributes = this.attributes();
-    const relationships = this.relationships();
+    const keysForAttributes = this.constructor.keysForAttributes();
+    const keysForRelationships = this.constructor.keysForRelationships();
 
     object.attributes = [
-      ...Object.keys(attributes),
-      ...Object.keys(relationships)
+      ...keysForAttributes,
+      ...keysForRelationships
     ];
 
-    for (const key in relationships) {
-      if (relationships.hasOwnProperty(key)) {
-        object[key] = {
-          ref: 'id',
-          attributes: relationships[key].attributes()
-        };
-      }
-    }
+    keysForRelationships.forEach((key) => {
+      const Relationship = this[key][this.constructor.symbols.relationship];
+      object[key] = {
+        ref: 'id',
+        attributes: Relationship.keysForAttributes()
+      };
+    });
 
     return object;
   }
@@ -83,48 +139,6 @@ class Base {
   static deserializerOptions = {
     keyForAttribute: 'camelCase'
   };
-
-  _isPrivate(member) {
-    return member.charAt(0) === '_';
-  }
-
-  _isAttribute(key) {
-    return this.hasOwnProperty(key)
-      && key !== 'id'
-      && !this._isPrivate(key)
-      && typeof this[key] !== 'function'
-      && typeof this[key] !== 'object';
-  }
-
-  _isRelationship(key) {
-    return this.hasOwnProperty(key)
-      && !this._isPrivate(key)
-      && typeof this[key] === 'object';
-  }
-
-  attributes() {
-    let attributes = {};
-
-    for (let key in this) {
-      if (this._isAttribute(key)) {
-        attributes[key] = this[key];
-      }
-    }
-
-    return attributes;
-  }
-
-  relationships() {
-    let relationships = {};
-
-    for (let key in this) {
-      if (this._isRelationship(key)) {
-        relationships[key] = this[key];
-      }
-    }
-
-    return relationships;
-  }
 
   serialize() {
     return new Serializer(

@@ -28,53 +28,6 @@ describe('Model', () => {
     });
   });
 
-  describe('#attributes()', () => {
-    test('it returns model attributes', () => {
-      const model = new Model({
-        id: '123'
-      });
-
-      // Set fake values on model
-      model.foo = 'foo';
-      model.bar = 'bar';
-      model._foo = '_foo';
-
-      model.printFoo = () => 'foo';
-      model.objectFoo = {
-        foo: 'bar'
-      };
-      model.arrayFoo = ['foo'];
-
-      expect(model.attributes()).toEqual({
-        foo: 'foo',
-        bar: 'bar'
-      });
-    });
-  });
-
-  describe('#relationships()', () => {
-    test('it returns model relationships', () => {
-      const model = new Model();
-
-      // Set fake values on model
-      model.foo = 'foo';
-      model.bar = 'bar';
-
-      model.printFoo = () => 'foo';
-      model.objectFoo = {
-        foo: 'bar'
-      };
-      model.arrayFoo = ['foo'];
-
-      expect(model.relationships()).toEqual({
-        objectFoo: {
-          foo: 'bar'
-        },
-        arrayFoo: ['foo']
-      });
-    });
-  });
-
   describe('#valid', () => {
     describe('when invalid', () => {
       test('it returns false', () => {
@@ -684,38 +637,6 @@ describe('Model', () => {
     });
   });
 
-  describe('#serializerOptions()', () => {
-    test('it returns the right options', () => {
-      const model = new Model();
-
-      const attributesSpy = jest.spyOn(model, 'attributes').mockReturnValue({
-        firstName: 'John',
-        lastName: 'Doe'
-      });
-
-      const relationshipsSpy = jest.spyOn(model, 'relationships').mockReturnValue({
-        address: {
-          type: 'work',
-          street: 'Dogwood Way',
-          zip: '12345',
-          attributes() {
-            return ['type', 'street', 'zip'];
-          }
-        }
-      });
-
-      expect(model.serializerOptions()).toEqual({
-        attributes: ['firstName', 'lastName', 'address'],
-        address: {
-          ref: 'id',
-          attributes: ['type', 'street', 'zip']
-        }
-      });
-      expect(attributesSpy).toHaveBeenCalled();
-      expect(relationshipsSpy).toHaveBeenCalled();
-    });
-  });
-
   describe('.deserializerOptions', () => {
     test('it returns the right defaults', () => {
       expect(Model.deserializerOptions).toEqual({
@@ -777,6 +698,117 @@ describe('Model', () => {
         }));
         expect(JSONAPISerializer.Deserializer.mock.instances.length).toBe(1);
         expect(JSONAPISerializer.Deserializer).toHaveBeenCalledWith(User.deserializerOptions);
+      });
+    });
+  });
+
+  describe('.keysForAttributes()', () => {
+    test('it returns an array of attribute keys', () => {
+      class Address extends Model {
+        constructor(args = {}) {
+          super(args);
+          this.type = args.type;
+          this.street = args.street;
+          this.zip = args.zip;
+        }
+      }
+
+      class DriversLicense extends Model {
+        constructor(args = {}) {
+          super(args);
+          this.licenseNumber = args.licenseNumber;
+        }
+      }
+
+      class Person extends Model {
+        constructor(args = {}) {
+          super(args);
+          this.firstName = args.firstName || '';
+          this.lastName = args.lastName;
+          this.addresses = this.hasMany(Address, args.addresses);
+          this.driversLicense = this.hasOne(DriversLicense, args.driversLicense);
+        }
+      }
+
+      expect(Address.keysForAttributes()).toEqual(['type', 'street', 'zip']);
+      expect(DriversLicense.keysForAttributes()).toEqual(['licenseNumber']);
+      expect(Person.keysForAttributes()).toEqual(['firstName', 'lastName']);
+    });
+  });
+
+  describe('.keysForRelationships()', () => {
+    test('it returns an array of attribute keys', () => {
+      class Address extends Model {
+        constructor(args = {}) {
+          super(args);
+          this.type = args.type;
+          this.street = args.street;
+          this.zip = args.zip;
+        }
+      }
+
+      class DriversLicense extends Model {
+        constructor(args = {}) {
+          super(args);
+          this.licenseNumber = args.licenseNumber;
+        }
+      }
+
+      class Person extends Model {
+        constructor(args = {}) {
+          super(args);
+          this.firstName = args.firstName || '';
+          this.lastName = args.lastName;
+          this.addresses = this.hasMany(Address, args.addresses);
+          this.driversLicense = this.belongsTo(DriversLicense, args.driversLicense);
+        }
+      }
+
+      expect(Address.keysForRelationships()).toEqual([]);
+      expect(DriversLicense.keysForRelationships()).toEqual([]);
+      expect(Person.keysForRelationships()).toEqual(['addresses', 'driversLicense']);
+    });
+  });
+
+  describe('#serializerOptions()', () => {
+    test('it returns the right defaults', () => {
+      class Address extends Model {
+        constructor(args = {}) {
+          super(args);
+          this.type = args.type;
+          this.street = args.street;
+          this.zip = args.zip;
+        }
+      }
+
+      class DriversLicense extends Model {
+        constructor(args = {}) {
+          super(args);
+          this.licenseNumber = args.licenseNumber;
+        }
+      }
+
+      class Person extends Model {
+        constructor(args = {}) {
+          super(args);
+          this.firstName = args.firstName || '';
+          this.lastName = args.lastName;
+          this.addresses = this.hasMany(Address, args.addresses);
+          this.driversLicense = this.hasOne(DriversLicense, args.driversLicense);
+        }
+      }
+
+      const person = new Person();
+      expect(person.serializerOptions()).toEqual({
+        attributes: ['firstName', 'lastName', 'addresses', 'driversLicense'],
+        addresses: {
+          ref: 'id',
+          attributes: ['type', 'street', 'zip']
+        },
+        driversLicense: {
+          ref: 'id',
+          attributes: ['licenseNumber']
+        }
       });
     });
   });
