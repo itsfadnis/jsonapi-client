@@ -94,12 +94,12 @@ class Base {
     return keys;
   }
 
-  static _urlParams() {
+  static urlParams() {
     return this.baseURL.match(/:[a-z_]+/g);
   }
 
-  static constructBaseURL(args) {
-    const urlParams = this._urlParams();
+  static constructBaseURL(args = {}) {
+    const urlParams = this.urlParams();
     if (!urlParams) return this.baseURL;
 
     let url = this.baseURL;

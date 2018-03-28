@@ -579,7 +579,7 @@ describe('Model', () => {
     });
   });
 
-  describe('._urlParams()', () => {
+  describe('.urlParams()', () => {
     afterEach(() => {
       Model.baseURL = '';
     });
@@ -588,7 +588,7 @@ describe('Model', () => {
       test('it returns an array of them', () => {
         Model.baseURL = '/posts/:post_id/comments/:comment_id/likes';
 
-        expect(Model._urlParams()).toEqual([
+        expect(Model.urlParams()).toEqual([
           ':post_id',
           ':comment_id'
         ]);
@@ -599,7 +599,7 @@ describe('Model', () => {
       test('it returns null', () => {
         Model.baseURL = '/posts';
 
-        expect(Model._urlParams()).toBeNull();
+        expect(Model.urlParams()).toBeNull();
       });
     });
   });
