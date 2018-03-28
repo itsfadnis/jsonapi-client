@@ -12,8 +12,8 @@ describe('Model', () => {
         });
 
         expect(model.id).toBe('1');
-        expect(model._persisted).toBe(true);
-        expect(model._errors).toBeInstanceOf(JSONAPIError);
+        expect(model.persisted).toBe(true);
+        expect(model.errors).toBeInstanceOf(JSONAPIError);
       });
     });
 
@@ -22,8 +22,8 @@ describe('Model', () => {
         const model = new Model();
 
         expect(typeof model.id).toBe('string');
-        expect(model._persisted).toBe(false);
-        expect(model._errors).toBeInstanceOf(JSONAPIError);
+        expect(model.persisted).toBe(false);
+        expect(model.errors).toBeInstanceOf(JSONAPIError);
       });
     });
   });
@@ -358,7 +358,7 @@ describe('Model', () => {
     describe('on persisted model', () => {
       test('it calls & returns #_update()', () => {
         const model = new Model();
-        model._persisted = true;
+        model.persisted = true;
         model._update = jest.fn().mockReturnValue('something');
 
         const returnValue = model.save();
@@ -371,7 +371,7 @@ describe('Model', () => {
     describe('on new model', () => {
       test('it calls & returns #_create()', () => {
         const model = new Model();
-        model._persisted = false;
+        model.persisted = false;
         model._create = jest.fn().mockReturnValue('something');
 
         const returnValue = model.save();
@@ -547,7 +547,7 @@ describe('Model', () => {
           expect(Model.adapter.patch.mock.calls[0][1]).toEqual(mockSerializedObject);
           expect(process422ResponseSpy).toHaveBeenCalledWith(response);
           expect(serializeSpy).toHaveBeenCalled();
-          expect(model._errors).toEqual(new JSONAPIError(response.data));
+          expect(model.errors).toEqual(new JSONAPIError(response.data));
           expect(response).toEqual({
             status: 422,
             statusText: 'Unprocessable Entity',

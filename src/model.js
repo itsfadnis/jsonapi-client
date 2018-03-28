@@ -4,10 +4,37 @@ const { Serializer, Deserializer } = require('jsonapi-serializer');
 class Base {
   static baseURL = '';
 
+  static symbols = {
+    errors: Symbol('errors'),
+    persisted: Symbol('persisted')
+  };
+
   constructor(args = {}) {
     this.id = !!args.id ? String(args.id) : Math.random().toString(36).substring(2, 15);
-    this._errors = new Errors();
-    this._persisted = !!args.id;
+
+    const {
+      errors,
+      persisted
+    } = this.constructor.symbols;
+
+    this[errors] = new Errors();
+    this[persisted] = !!args.id;
+  }
+
+  get errors() {
+    return this[this.constructor.symbols.errors];
+  }
+
+  set errors(errors) {
+    this[this.constructor.symbols.errors] = new Errors(errors);
+  }
+
+  get persisted() {
+    return this[this.constructor.symbols.persisted];
+  }
+
+  set persisted(persisted) {
+    this[this.constructor.symbols.persisted] = persisted;
   }
 
   static _urlParams() {
@@ -112,10 +139,6 @@ class Base {
       .then(object => new this(object));
   }
 
-  get errors() {
-    return this._errors;
-  }
-
   get valid() {
     this.errors.clear();
     this.validate();
@@ -177,7 +200,7 @@ class Base {
   }
 
   save() {
-    return this._persisted ? this._update() : this._create();
+    return this.persisted ? this._update() : this._create();
   }
 
   static destroy(id, args = {}) {
@@ -197,7 +220,7 @@ class Base {
   }
 
   _process422Response(response) {
-    this._errors = new Errors(response.data);
+    this.errors = new Errors(response.data);
   }
 
   static new(args = {}) {
