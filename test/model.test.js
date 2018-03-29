@@ -5,25 +5,32 @@ const JSONAPISerializer = require('jsonapi-serializer');
 
 describe('Model', () => {
   describe('instantiation', () => {
-    describe('with id', () => {
+    describe('with args passed in', () => {
       test('it sets the right values', () => {
         const model = new Model({
-          id: 1
+          id: 1,
+          links: {
+            self: '/foo/1'
+          }
         });
 
         expect(model.id).toBe('1');
         expect(model.persisted).toBe(true);
-        expect(model.errors).toBeInstanceOf(JSONAPIError);
+        expect(model.errors).toEqual(new JSONAPIError());
+        expect(model.links).toEqual({
+          self: '/foo/1'
+        });
       });
     });
 
-    describe('without id', () => {
-      test('it sets the right values', () => {
+    describe('without args passed in', () => {
+      test('it sets the right defaults', () => {
         const model = new Model();
 
         expect(typeof model.id).toBe('string');
         expect(model.persisted).toBe(false);
-        expect(model.errors).toBeInstanceOf(JSONAPIError);
+        expect(model.errors).toEqual(new JSONAPIError());
+        expect(model.links).toEqual({});
       });
     });
   });
