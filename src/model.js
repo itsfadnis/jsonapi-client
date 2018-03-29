@@ -7,6 +7,7 @@ class Base {
   static symbols = {
     errors: Symbol('errors'),
     persisted: Symbol('persisted'),
+    links: Symbol('links'),
     relationship: Symbol('relationship')
   };
 
@@ -15,11 +16,13 @@ class Base {
 
     const {
       errors,
-      persisted
+      persisted,
+      links
     } = this.constructor.symbols;
 
     this[errors] = new Errors();
     this[persisted] = !!args.id;
+    this[links] = args.links || {};
   }
 
   hasMany(Thing, array = []) {
@@ -54,6 +57,14 @@ class Base {
 
   set persisted(persisted) {
     this[this.constructor.symbols.persisted] = persisted;
+  }
+
+  get links() {
+    return this[this.constructor.symbols.links];
+  }
+
+  set links(links) {
+    this[this.constructor.symbols.links] = links;
   }
 
   isRelationship(key) {
