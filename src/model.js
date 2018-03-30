@@ -13,16 +13,9 @@ class Base {
 
   constructor(args = {}) {
     this.id = !!args.id ? String(args.id) : Math.random().toString(36).substring(2, 15);
-
-    const {
-      errors,
-      persisted,
-      links
-    } = this.constructor.symbols;
-
-    this[errors] = new Errors();
-    this[persisted] = !!args.id;
-    this[links] = args.links || {};
+    this.errors = new Errors();
+    this.persisted = !!args.id;
+    this.links = args.links || {};
   }
 
   hasMany(Thing, array = []) {
