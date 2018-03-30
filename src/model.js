@@ -98,6 +98,16 @@ class Base {
     return keys;
   }
 
+  attributes() {
+    let object = {};
+    for (const key in this) {
+      if (this.isAttribute(key)) {
+        object[key] = this[key];
+      }
+    }
+    return object;
+  }
+
   static urlParams() {
     return this.baseURL.match(/:[a-z_]+/g);
   }

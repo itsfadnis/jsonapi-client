@@ -736,7 +736,7 @@ describe('Model', () => {
       class Person extends Model {
         constructor(args = {}) {
           super(args);
-          this.firstName = args.firstName || '';
+          this.firstName = args.firstName;
           this.lastName = args.lastName;
           this.addresses = this.hasMany(Address, args.addresses);
           this.driversLicense = this.hasOne(DriversLicense, args.driversLicense);
@@ -750,7 +750,7 @@ describe('Model', () => {
   });
 
   describe('.keysForRelationships()', () => {
-    test('it returns an array of attribute keys', () => {
+    test('it returns an array of relationship keys', () => {
       class Address extends Model {
         constructor(args = {}) {
           super(args);
@@ -770,7 +770,7 @@ describe('Model', () => {
       class Person extends Model {
         constructor(args = {}) {
           super(args);
-          this.firstName = args.firstName || '';
+          this.firstName = args.firstName;
           this.lastName = args.lastName;
           this.addresses = this.hasMany(Address, args.addresses);
           this.driversLicense = this.belongsTo(DriversLicense, args.driversLicense);
@@ -822,6 +822,46 @@ describe('Model', () => {
           ref: 'id',
           attributes: ['licenseNumber']
         }
+      });
+    });
+  });
+
+  describe('#attributes()', () => {
+    test('it returns model attributes', () => {
+      class Address extends Model {
+        constructor(args = {}) {
+          super(args);
+          this.type = args.type;
+          this.street = args.street;
+          this.zip = args.zip;
+        }
+      }
+
+      class DriversLicense extends Model {
+        constructor(args = {}) {
+          super(args);
+          this.licenseNumber = args.licenseNumber;
+        }
+      }
+
+      class Person extends Model {
+        constructor(args = {}) {
+          super(args);
+          this.firstName = args.firstName;
+          this.lastName = args.lastName;
+          this.addresses = this.hasMany(Address, args.addresses);
+          this.driversLicense = this.hasOne(DriversLicense, args.driversLicense);
+        }
+      }
+
+      const person = new Person({
+        firstName: 'John',
+        lastName: 'Doe'
+      });
+
+      expect(person.attributes()).toEqual({
+        firstName: 'John',
+        lastName: 'Doe'
       });
     });
   });
