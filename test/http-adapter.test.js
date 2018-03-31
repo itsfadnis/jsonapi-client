@@ -11,6 +11,7 @@ describe('HttpAdapter', () => {
         'Content-Type': 'application/json',
         HTTP_X_REQUESTED_WITH: 'XMLHttpRequest'
       });
+      expect(adapter.fetch).toEqual(window.fetch);
     });
 
     test('it sets the right values with params passed in', () => {
@@ -19,7 +20,8 @@ describe('HttpAdapter', () => {
         namespace: '/v2',
         headers: {
           boo: 'baz'
-        }
+        },
+        fetch: 'fetchpassedin'
       });
       expect(adapter.baseURL).toBe('foo.com');
       expect(adapter.namespace).toBe('/v2');
@@ -29,6 +31,7 @@ describe('HttpAdapter', () => {
         HTTP_X_REQUESTED_WITH: 'XMLHttpRequest',
         boo: 'baz'
       });
+      expect(adapter.fetch).toBe('fetchpassedin');
     });
   });
 
@@ -47,20 +50,19 @@ describe('HttpAdapter', () => {
   });
 
   describe('#request(method, url, data)', () => {
+    let adapter;
     beforeAll(() => {
-      window.fetch = jest.fn();
-      window.Request = jest.fn();
+      adapter = new HttpAdapter({
+        fetch: jest.fn()
+      });
     });
 
     afterEach(() => {
-      window.fetch.mockClear();
-      window.Request.mockClear();
+      adapter.fetch.mockClear();
     });
 
     describe('when response is not ok', () => {
       test('it rejects the response', () => {
-        const adapter = new HttpAdapter();
-
         const extractResponseHeadersSpy = jest.spyOn(adapter, 'extractResponseHeaders').mockReturnValue({
           'content-type': 'application/json'
         });
@@ -71,16 +73,14 @@ describe('HttpAdapter', () => {
           statusText: 'Not Found'
         };
 
-        fetch.mockReturnValue(Promise.resolve(mockResponse));
+        adapter.fetch.mockReturnValue(Promise.resolve(mockResponse));
 
         return adapter.request('GET', '/foo').catch((response) => {
-          expect(Request.mock.calls[0][0]).toBe(adapter.baseURL + adapter.namespace + '/foo');
-          expect(Request.mock.calls[0][1]).toEqual({
+          expect(adapter.fetch).toHaveBeenCalledWith(adapter.baseURL + adapter.namespace + '/foo', {
             method: 'GET',
             headers: adapter.headers,
             body: undefined
           });
-          expect(fetch.mock.calls[0][0]).toEqual(Request.mock.instances[0]);
           expect(extractResponseHeadersSpy).toHaveBeenCalledWith(mockResponse);
           expect(response).toEqual({
             status: 404,
@@ -97,8 +97,6 @@ describe('HttpAdapter', () => {
     describe('when response is ok', () => {
       describe('without request body (GET/DELETE)', () => {
         test('it resolves to the parsed response', () => {
-          const adapter = new HttpAdapter();
-
           const extractResponseHeadersSpy = jest.spyOn(adapter, 'extractResponseHeaders').mockReturnValue({
             'content-type': 'application/json'
           });
@@ -110,16 +108,14 @@ describe('HttpAdapter', () => {
             json: () => Promise.resolve({ foo: 'bar' })
           };
 
-          fetch.mockReturnValue(Promise.resolve(mockResponse));
+          adapter.fetch.mockReturnValue(Promise.resolve(mockResponse));
 
           return adapter.request('GET', '/foo').then((response) => {
-            expect(Request.mock.calls[0][0]).toBe(adapter.baseURL + adapter.namespace + '/foo');
-            expect(Request.mock.calls[0][1]).toEqual({
+            expect(adapter.fetch).toHaveBeenCalledWith(adapter.baseURL + adapter.namespace + '/foo', {
               method: 'GET',
               headers: adapter.headers,
               body: undefined
             });
-            expect(fetch.mock.calls[0][0]).toEqual(Request.mock.instances[0]);
             expect(extractResponseHeadersSpy).toHaveBeenCalledWith(mockResponse);
             expect(response).toEqual({
               status: 200,
@@ -138,8 +134,6 @@ describe('HttpAdapter', () => {
 
       describe('with request body (POST/PATCH/PUT)', () => {
         test('it resolves to the parsed response', () => {
-          const adapter = new HttpAdapter();
-
           const extractResponseHeadersSpy = jest.spyOn(adapter, 'extractResponseHeaders').mockReturnValue({
             'content-type': 'application/json'
           });
@@ -151,16 +145,14 @@ describe('HttpAdapter', () => {
             json: () => Promise.resolve({ foo: 'bar' })
           };
 
-          fetch.mockReturnValue(Promise.resolve(mockResponse));
+          adapter.fetch.mockReturnValue(Promise.resolve(mockResponse));
 
           return adapter.request('POST', '/foo', { boo: 'baz' }).then((response) => {
-            expect(Request.mock.calls[0][0]).toBe(adapter.baseURL + adapter.namespace + '/foo');
-            expect(Request.mock.calls[0][1]).toEqual({
+            expect(adapter.fetch).toHaveBeenCalledWith(adapter.baseURL + adapter.namespace + '/foo', {
               method: 'POST',
               headers: adapter.headers,
               body: JSON.stringify({ boo: 'baz' })
             });
-            expect(fetch.mock.calls[0][0]).toEqual(Request.mock.instances[0]);
             expect(extractResponseHeadersSpy).toHaveBeenCalledWith(mockResponse);
             expect(response).toEqual({
               status: 201,
@@ -179,8 +171,6 @@ describe('HttpAdapter', () => {
 
       describe('when response body is not json', () => {
         test('it resolves to the parsed response', () => {
-          const adapter = new HttpAdapter();
-
           const extractResponseHeadersSpy = jest.spyOn(adapter, 'extractResponseHeaders').mockReturnValue({
             'content-type': 'application/json'
           });
@@ -192,16 +182,14 @@ describe('HttpAdapter', () => {
             json: () => Promise.reject()
           };
 
-          fetch.mockReturnValue(Promise.resolve(mockResponse));
+          adapter.fetch.mockReturnValue(Promise.resolve(mockResponse));
 
           return adapter.request('DELETE', '/foo').then((response) => {
-            expect(Request.mock.calls[0][0]).toBe(adapter.baseURL + adapter.namespace + '/foo');
-            expect(Request.mock.calls[0][1]).toEqual({
+            expect(adapter.fetch).toHaveBeenCalledWith(adapter.baseURL + adapter.namespace + '/foo', {
               method: 'DELETE',
               headers: adapter.headers,
               body: undefined
             });
-            expect(fetch.mock.calls[0][0]).toEqual(Request.mock.instances[0]);
             expect(extractResponseHeadersSpy).toHaveBeenCalledWith(mockResponse);
             expect(response).toEqual({
               status: 200,

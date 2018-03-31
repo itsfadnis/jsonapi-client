@@ -8,6 +8,7 @@ class HttpAdapter {
       HTTP_X_REQUESTED_WITH: 'XMLHttpRequest',
       ...args.headers
     };
+    this.fetch = args.fetch || window.fetch;
   }
 
   get(url) {
@@ -39,13 +40,11 @@ class HttpAdapter {
   }
 
   request(method, url, data) {
-    const request = new Request(this.baseURL + this.namespace + url, {
+    return this.fetch(this.baseURL + this.namespace + url, {
       method,
       headers: this.headers,
       body: data && JSON.stringify(data)
-    });
-
-    return fetch(request).then((response) => {
+    }).then((response) => {
       const payload = {
         status: response.status,
         statusText: response.statusText,
