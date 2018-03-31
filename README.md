@@ -21,11 +21,16 @@ import { HttpAdapter, Model } from '@itsfadnis/jsonapi-client';
 
 // Setup an instance of the adapter for the model
 Model.adapter = new HttpAdapter({
+  // Defaults to `${window.location.protocol}//${window.location.host}`
   baseURL: 'https://foo.com',
+  // Defaults to ''
   namespace: '/v2',
   headers: {
     key: 'value'
-  }
+  },
+  // The adapter uses the Fetch API for making network requests
+  // You can pass it in as an option, else it will default to window.fetch
+  fetch: window.fetch
 });
 ```
 
