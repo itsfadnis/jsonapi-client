@@ -22,7 +22,7 @@ import { HttpAdapter, Model } from '@itsfadnis/jsonapi-client';
 // Setup an instance of the adapter for the model
 Model.adapter = new HttpAdapter({
   // Defaults to `${window.location.protocol}//${window.location.host}`
-  baseURL: 'https://foo.com',
+  host: 'https://foo.com',
   // Defaults to ''
   namespace: '/v2',
   headers: {
