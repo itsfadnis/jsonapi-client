@@ -1,6 +1,6 @@
 class HttpAdapter {
   constructor(args = {}) {
-    this.baseURL = args.baseURL || `${ window.location.protocol }//${ window.location.host }`;
+    this.host = args.host || `${window.location.protocol}//${window.location.host}`;
     this.namespace = args.namespace || '';
     this.headers = {
       Accept: 'application/json',
@@ -40,7 +40,7 @@ class HttpAdapter {
   }
 
   request(method, url, data) {
-    return this.fetch(this.baseURL + this.namespace + url, {
+    return this.fetch(this.host + this.namespace + url, {
       method,
       headers: this.headers,
       body: data && JSON.stringify(data)

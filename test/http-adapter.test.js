@@ -4,7 +4,7 @@ describe('HttpAdapter', () => {
   describe('instantiation', () => {
     test('it sets the right defaults if nothing is passed in', () => {
       const adapter = new HttpAdapter();
-      expect(adapter.baseURL).toBe(`${window.location.protocol}//${window.location.host}`);
+      expect(adapter.host).toBe(`${window.location.protocol}//${window.location.host}`);
       expect(adapter.namespace).toBe('');
       expect(adapter.headers).toEqual({
         Accept: 'application/json',
@@ -16,14 +16,14 @@ describe('HttpAdapter', () => {
 
     test('it sets the right values with params passed in', () => {
       const adapter = new HttpAdapter({
-        baseURL: 'foo.com',
+        host: 'foo.com',
         namespace: '/v2',
         headers: {
           boo: 'baz'
         },
         fetch: 'fetchpassedin'
       });
-      expect(adapter.baseURL).toBe('foo.com');
+      expect(adapter.host).toBe('foo.com');
       expect(adapter.namespace).toBe('/v2');
       expect(adapter.headers).toEqual({
         Accept: 'application/json',
@@ -76,7 +76,7 @@ describe('HttpAdapter', () => {
         adapter.fetch.mockReturnValue(Promise.resolve(mockResponse));
 
         return adapter.request('GET', '/foo').catch((response) => {
-          expect(adapter.fetch).toHaveBeenCalledWith(adapter.baseURL + adapter.namespace + '/foo', {
+          expect(adapter.fetch).toHaveBeenCalledWith(adapter.host + adapter.namespace + '/foo', {
             method: 'GET',
             headers: adapter.headers,
             body: undefined
@@ -111,7 +111,7 @@ describe('HttpAdapter', () => {
           adapter.fetch.mockReturnValue(Promise.resolve(mockResponse));
 
           return adapter.request('GET', '/foo').then((response) => {
-            expect(adapter.fetch).toHaveBeenCalledWith(adapter.baseURL + adapter.namespace + '/foo', {
+            expect(adapter.fetch).toHaveBeenCalledWith(adapter.host + adapter.namespace + '/foo', {
               method: 'GET',
               headers: adapter.headers,
               body: undefined
@@ -148,7 +148,7 @@ describe('HttpAdapter', () => {
           adapter.fetch.mockReturnValue(Promise.resolve(mockResponse));
 
           return adapter.request('POST', '/foo', { boo: 'baz' }).then((response) => {
-            expect(adapter.fetch).toHaveBeenCalledWith(adapter.baseURL + adapter.namespace + '/foo', {
+            expect(adapter.fetch).toHaveBeenCalledWith(adapter.host + adapter.namespace + '/foo', {
               method: 'POST',
               headers: adapter.headers,
               body: JSON.stringify({ boo: 'baz' })
@@ -185,7 +185,7 @@ describe('HttpAdapter', () => {
           adapter.fetch.mockReturnValue(Promise.resolve(mockResponse));
 
           return adapter.request('DELETE', '/foo').then((response) => {
-            expect(adapter.fetch).toHaveBeenCalledWith(adapter.baseURL + adapter.namespace + '/foo', {
+            expect(adapter.fetch).toHaveBeenCalledWith(adapter.host + adapter.namespace + '/foo', {
               method: 'DELETE',
               headers: adapter.headers,
               body: undefined
