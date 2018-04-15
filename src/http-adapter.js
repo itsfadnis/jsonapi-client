@@ -1,6 +1,6 @@
 class HttpAdapter {
   constructor(args = {}) {
-    this.host = args.host || `${window.location.protocol}//${window.location.host}`;
+    this.host = args.host || args.baseURL || `${window.location.protocol}//${window.location.host}`;
     this.namespace = args.namespace || '';
     this.headers = {
       Accept: 'application/json',
