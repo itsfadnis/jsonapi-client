@@ -69,24 +69,40 @@ describe('HttpAdapter', () => {
 
         const mockResponse = {
           ok: false,
-          status: 404,
-          statusText: 'Not Found'
+          status: 422,
+          statusText: 'Unprocessable Entitiy',
+          text: () => Promise.resolve(JSON.stringify({
+            errors: [{
+              code: 'foo'
+            }, {
+              code: 'bar'
+            }]
+          }))
         };
 
         adapter.fetch.mockReturnValue(Promise.resolve(mockResponse));
 
-        return adapter.request('GET', '/foo').catch((response) => {
+        return adapter.request('POST', '/foo', { foo: 'bar' }).catch((response) => {
           expect(adapter.fetch).toHaveBeenCalledWith(adapter.host + adapter.namespace + '/foo', {
-            method: 'GET',
+            method: 'POST',
             headers: adapter.headers,
-            body: undefined
+            body: JSON.stringify({
+              foo: 'bar'
+            })
           });
           expect(extractResponseHeadersSpy).toHaveBeenCalledWith(mockResponse);
           expect(response).toEqual({
-            status: 404,
-            statusText: 'Not Found',
+            status: 422,
+            statusText: 'Unprocessable Entitiy',
             headers: {
               'content-type': 'application/json'
+            },
+            data: {
+              errors: [{
+                code: 'foo'
+              }, {
+                code: 'bar'
+              }]
             }
           });
           extractResponseHeadersSpy.mockRestore();
@@ -105,7 +121,7 @@ describe('HttpAdapter', () => {
             ok: true,
             status: 200,
             statusText: 'OK',
-            json: () => Promise.resolve({ foo: 'bar' })
+            text: () => Promise.resolve(JSON.stringify({ foo: 'bar' }))
           };
 
           adapter.fetch.mockReturnValue(Promise.resolve(mockResponse));
@@ -142,7 +158,7 @@ describe('HttpAdapter', () => {
             ok: true,
             status: 201,
             statusText: 'Created',
-            json: () => Promise.resolve({ foo: 'bar' })
+            text: () => Promise.resolve(JSON.stringify({ foo: 'bar' }))
           };
 
           adapter.fetch.mockReturnValue(Promise.resolve(mockResponse));
@@ -179,7 +195,7 @@ describe('HttpAdapter', () => {
             ok: true,
             status: 200,
             statusText: 'OK',
-            json: () => Promise.reject()
+            text: () => Promise.resolve()
           };
 
           adapter.fetch.mockReturnValue(Promise.resolve(mockResponse));

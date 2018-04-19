@@ -39,26 +39,35 @@ class HttpAdapter {
     return object;
   }
 
+  extractResponseBody(response) {
+    return response.text().then((text) => {
+      try {
+        return JSON.parse(text);
+      } catch (err) {
+        return undefined;
+      }
+    });
+  }
+
   request(method, url, data) {
     return this.fetch(this.host + this.namespace + url, {
       method,
       headers: this.headers,
       body: data && JSON.stringify(data)
     }).then((response) => {
-      const payload = {
+      let payload = {
         status: response.status,
         statusText: response.statusText,
         headers: this.extractResponseHeaders(response)
       };
-      if (!response.ok) { throw payload; }
-
-      return response.json().then((json) => {
-        return {
-          ...payload,
-          data: json
-        };
-      }).catch(() => {
-        return payload;
+      return this.extractResponseBody(response).then((json) => {
+        if (json) {
+          payload.data = json;
+        }
+        if (response.ok) {
+          return payload;
+        }
+        throw payload;
       });
     });
   }
