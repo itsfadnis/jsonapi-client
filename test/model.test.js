@@ -605,6 +605,12 @@ describe('Model', () => {
           ':post_id',
           ':comment_id'
         ]);
+
+        Model.baseURL = '/posts/:postId/comments/:commentId/likes';
+        expect(Model.urlParams()).toEqual([
+          ':postId',
+          ':commentId'
+        ]);
       });
     });
 

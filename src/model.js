@@ -109,7 +109,7 @@ class Base {
   }
 
   static urlParams() {
-    return this.baseURL.match(/:[a-z_]+/g);
+    return this.baseURL.match(/:\w+/g);
   }
 
   static constructBaseURL(args = {}) {
