@@ -11,26 +11,6 @@ class HttpAdapter {
     this.fetch = args.fetch || window.fetch;
   }
 
-  get(url) {
-    return this.request('GET', url);
-  }
-
-  post(url, data) {
-    return this.request('POST', url, data);
-  }
-
-  put(url, data) {
-    return this.request('PUT', url, data);
-  }
-
-  patch(url, data) {
-    return this.request('PATCH', url, data);
-  }
-
-  delete(url) {
-    return this.request('DELETE', url);
-  }
-
   extractResponseHeaders(response) {
     let object = {};
     for (const [key, value] of response.headers.entries()) {
@@ -72,5 +52,13 @@ class HttpAdapter {
     });
   }
 }
+
+['get', 'delete', 'post', 'put', 'patch'].forEach((method) => {
+  HttpAdapter.prototype[method] = function fn() {
+    const args = Array.prototype.slice.call(arguments);
+    args.unshift(method.toUpperCase());
+    return this.request.apply(this, args);
+  };
+});
 
 module.exports = HttpAdapter;
