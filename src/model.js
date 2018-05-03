@@ -114,18 +114,22 @@ class Base {
 
   static constructBaseURL(args = {}) {
     const urlParams = this.urlParams();
-    if (!urlParams) return this.baseURL;
-
     let url = this.baseURL;
     urlParams.forEach((item) => {
       url = url.replace(item, args[item.substring(1)]);
     });
-
     return url;
   }
 
-  constructBaseURL(args) {
-    return this.constructor.constructBaseURL(args);
+  constructBaseURL() {
+    const urlParams = this.constructor.urlParams();
+    if (!urlParams) {
+      return this.constructor.baseURL;
+    }
+    throw new Error(
+      'Missing url params: ' + urlParams.join(', ') + '.\n' +
+      'Override the #constructBaseURL() method of ' + this.constructor.name + '.'
+    );
   }
 
   serializerOptions() {

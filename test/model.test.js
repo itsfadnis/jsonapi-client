@@ -624,35 +624,41 @@ describe('Model', () => {
   });
 
   describe('.constructBaseURL(args)', () => {
-    afterEach(() => {
+    test('it returns the right url', () => {
+      Model.baseURL = '/posts/:post_id/comments/:comment_id/likes';
+      expect(Model.constructBaseURL({
+        post_id: 101,
+        comment_id: 234
+      })).toBe('/posts/101/comments/234/likes');
       Model.baseURL = '';
-    });
-
-    describe('with no args', () => {
-      test('it returns the right url ', () => {
-        Model.baseURL = '/foo/bar';
-        expect(Model.constructBaseURL()).toBe('/foo/bar');
-      });
-    });
-
-    describe('with args', () => {
-      test('it returns the right url', () => {
-        Model.baseURL = '/posts/:post_id/comments/:comment_id/likes';
-        expect(Model.constructBaseURL({
-          post_id: 101,
-          comment_id: 234
-        })).toBe('/posts/101/comments/234/likes');
-      });
     });
   });
 
   describe('#constructBaseURL()', () => {
-    test('it calls & returns .constructBaseURL()', () => {
-      const spy = jest.spyOn(Model, 'constructBaseURL').mockReturnValue('/xyz');
-      const model = new Model();
-      expect(model.constructBaseURL()).toBe('/xyz');
-      expect(spy).toHaveBeenCalled();
-      spy.mockRestore();
+    describe('without url params', () => {
+      test('it returns the baseURL', () => {
+        const spy = jest.spyOn(Model, 'urlParams').mockReturnValue(null);
+        Model.baseURL = '/foo';
+        const model = new Model();
+        expect(model.constructBaseURL()).toBe('/foo');
+        expect(spy).toHaveBeenCalled();
+        spy.mockRestore();
+        Model.baseURL = '';
+      });
+    });
+
+    describe('with url params', () => {
+      test('it throws an error', () => {
+        const urlParams = [':post_id', ':comment_id'];
+        const spy = jest.spyOn(Model, 'urlParams').mockReturnValue(urlParams);
+        const model = new Model();
+        expect(model.constructBaseURL.bind(model)).toThrow(
+          'Missing url params: :post_id, :comment_id.\n' +
+          'Override the #constructBaseURL() method of ' + model.constructor.name + '.'
+        );
+        expect(spy).toHaveBeenCalled();
+        spy.mockRestore();
+      });
     });
   });
 
