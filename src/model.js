@@ -114,6 +114,9 @@ class Base {
 
   static constructBaseURL(args = {}) {
     const urlParams = this.urlParams();
+    if (!urlParams) {
+      return this.baseURL;
+    }
     let url = this.baseURL;
     urlParams.forEach((item) => {
       url = url.replace(item, args[item.substring(1)]);
