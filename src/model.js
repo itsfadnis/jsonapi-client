@@ -223,7 +223,7 @@ class Base {
       .then(({ data }) => this.constructor.deserialize(data))
       .then(object => object)
       .catch((err) => {
-        if (err.status === 422) this._process422Response(err);
+        this.errors = new Errors(err.data);
         throw err;
       });
   }
@@ -234,7 +234,7 @@ class Base {
       .then(({ data }) => this.constructor.deserialize(data))
       .then(object => object)
       .catch((err) => {
-        if (err.status === 422) this._process422Response(err);
+        this.errors = new Errors(err.data);
         throw err;
       });
   }
@@ -259,10 +259,6 @@ class Base {
 
   request(method, url, data) {
     return this.constructor.adapter.request(method, url, data);
-  }
-
-  _process422Response(response) {
-    this.errors = new Errors(response.data);
   }
 
   static new(args = {}) {

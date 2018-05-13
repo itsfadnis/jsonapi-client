@@ -505,13 +505,11 @@ describe('Model', () => {
           }
         };
         const serializeSpy = jest.spyOn(model, 'serialize').mockReturnValue(mockSerializedObject);
-        const process422ResponseSpy = jest.spyOn(model, '_process422Response');
 
         return model._update().catch((response) => {
           expect(Model.adapter.patch.mock.calls.length).toBe(1);
           expect(Model.adapter.patch.mock.calls[0][0]).toBe(`${ model.constructBaseURL() }/123`);
           expect(Model.adapter.patch.mock.calls[0][1]).toEqual(mockSerializedObject);
-          expect(process422ResponseSpy).toHaveBeenCalledWith(response);
           expect(serializeSpy).toHaveBeenCalled();
           expect(model.errors).toEqual(new JSONAPIError(response.data));
           expect(response).toEqual({
