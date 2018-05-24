@@ -112,6 +112,16 @@ class Base {
     return this.baseURL.match(/:\w+/g);
   }
 
+  static toQueryString(obj = {}) {
+    let q = [];
+    for (const key in obj) {
+      if (obj.hasOwnProperty(key)) {
+        q.push(encodeURIComponent(key) + '=' + encodeURIComponent(obj[key]));
+      }
+    }
+    return q.join('&');
+  }
+
   static constructBaseURL(args = {}) {
     const urlParams = this.urlParams();
     if (!urlParams) {
@@ -212,6 +222,16 @@ class Base {
   static fetchAll(args = {}) {
     return this.adapter
       .get(`${ this.constructBaseURL(args) }`)
+      .then(({ data }) => this.deserialize(data))
+      .then(array => array)
+      .catch((err) => { throw err; });
+  }
+
+  static query(query = {}, args = {}) {
+    const queryString = this.toQueryString(query);
+    const requestURL = this.constructBaseURL(args);
+    return this.adapter
+      .get(`${requestURL}?${queryString}`)
       .then(({ data }) => this.deserialize(data))
       .then(array => array)
       .catch((err) => { throw err; });

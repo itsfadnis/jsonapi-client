@@ -258,6 +258,119 @@ describe('Model', () => {
     });
   });
 
+  describe('.toQueryString(object)', () => {
+    test('it returns a query string', () => {
+      expect(Model.toQueryString({
+        foo: 'bar',
+        boo: 'baz'
+      })).toBe('foo=bar&boo=baz');
+    });
+  });
+
+  describe('.query(query, args)', () => {
+    afterEach(() => {
+      delete Model.adapter;
+    });
+
+    describe('on success', () => {
+      test('it resolves to an array of instances of the model', () => {
+        Model.adapter = new HttpAdapter();
+
+        const mockResponse = {
+          status: 200,
+          data: [{
+            type: 'users',
+            id: '123',
+            attributes: {
+              'first-name': 'John',
+              'last-name': 'Doe'
+            }
+          }, {
+            type: 'users',
+            id: '456',
+            attributes: {
+              'first-name': 'Jane',
+              'last-name': 'Doe'
+            }
+          }]
+        };
+
+        const toQueryStringSpy = jest.spyOn(Model, 'toQueryString').mockReturnValue('foo=bar');
+        const constructBaseURLSpy = jest.spyOn(Model, 'constructBaseURL').mockReturnValue('/xyz');
+        const getSpy = jest.spyOn(Model.adapter, 'get').mockReturnValue(
+          Promise.resolve(mockResponse)
+        );
+
+        const mockDeserializedArray = [
+          new Model({
+            id: '123',
+            firstName: 'John',
+            lastName: 'Doe'
+          }),
+          new Model({
+            id: '456',
+            firstName: 'Jane',
+            lastName: 'Doe'
+          })
+        ];
+        const deserializeSpy = jest.spyOn(Model, 'deserialize').mockReturnValue(
+          Promise.resolve(mockDeserializedArray)
+        );
+
+        return Model.query({ foo: 'bar' }, { boo: 'baz' }).then((response) => {
+          expect(toQueryStringSpy.mock.calls.length).toBe(1);
+          expect(toQueryStringSpy.mock.calls[0][0]).toEqual({ foo: 'bar' });
+
+          expect(constructBaseURLSpy.mock.calls.length).toBe(1);
+          expect(constructBaseURLSpy.mock.calls[0][0]).toEqual({ boo: 'baz' });
+
+          expect(getSpy.mock.calls.length).toBe(1);
+          expect(getSpy.mock.calls[0][0]).toEqual('/xyz?foo=bar');
+
+          expect(deserializeSpy).toHaveBeenCalledWith(mockResponse.data);
+          expect(response).toEqual(mockDeserializedArray);
+
+          deserializeSpy.mockRestore();
+          getSpy.mockRestore();
+          constructBaseURLSpy.mockRestore();
+          toQueryStringSpy.mockRestore();
+        });
+      });
+    });
+
+    describe('on failure', () => {
+      test('it rejects the recieved response', () => {
+        Model.adapter = new HttpAdapter();
+
+        const mockResponse = {
+          status: 500,
+          statusText: 'Internal Server Error'
+        };
+
+        const getSpy = jest.spyOn(Model.adapter, 'get').mockReturnValue(Promise.reject(mockResponse));
+        const constructBaseURLSpy = jest.spyOn(Model, 'constructBaseURL').mockReturnValue('/xyz');
+        const toQueryStringSpy = jest.spyOn(Model, 'toQueryString').mockReturnValue('foo=bar');
+
+        return Model.query({ foo: 'bar' }, { boo: 'baz' }).catch((response) => {
+          expect(toQueryStringSpy.mock.calls.length).toBe(1);
+          expect(toQueryStringSpy.mock.calls[0][0]).toEqual({ foo: 'bar' });
+
+          expect(constructBaseURLSpy.mock.calls.length).toBe(1);
+          expect(constructBaseURLSpy.mock.calls[0][0]).toEqual({ boo: 'baz' });
+
+          expect(getSpy.mock.calls.length).toBe(1);
+          expect(getSpy.mock.calls[0][0]).toEqual('/xyz?foo=bar');
+
+          expect(response).toEqual(mockResponse);
+
+          getSpy.mockRestore();
+          constructBaseURLSpy.mockRestore();
+          toQueryStringSpy.mockRestore();
+        });
+      });
+    });
+  });
+
   describe('.destroy(id, args)', () => {
     afterEach(() => {
       delete Model.adapter;
