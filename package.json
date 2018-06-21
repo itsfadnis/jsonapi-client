@@ -41,7 +41,8 @@
       }
     },
     "moduleNameMapper": {
-      "jsonapi-serializer": "<rootDir>/test/__mocks__/jsonapi-serializer.js"
+      "jsonapi-serializer/lib/serializer": "<rootDir>/test/__mocks__/serializer.js",
+      "jsonapi-serializer/lib/deserializer": "<rootDir>/test/__mocks__/deserializer.js"
     }
   }
 }

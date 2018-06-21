@@ -1,7 +1,8 @@
 const Model = require('../src/model');
 const HttpAdapter = require('../src/http-adapter');
 const JSONAPIError = require('../src/jsonapi-error');
-const JSONAPISerializer = require('jsonapi-serializer');
+const Serializer = require('jsonapi-serializer/lib/serializer');
+const Deserializer = require('jsonapi-serializer/lib/deserializer');
 
 describe('Model', () => {
   describe('instantiation', () => {
@@ -798,11 +799,11 @@ describe('Model', () => {
         }
       });
       expect(optionsSpy).toHaveBeenCalled();
-      expect(JSONAPISerializer.Serializer.mock.instances.length).toBe(1);
-      expect(JSONAPISerializer.Serializer).toHaveBeenCalledWith('base', {
+      expect(Serializer.mock.instances.length).toBe(1);
+      expect(Serializer).toHaveBeenCalledWith('base', {
         attributes: ['firstName', 'lastName']
       });
-      expect(JSONAPISerializer.Serializer.prototype.serialize).toHaveBeenCalledWith(model);
+      expect(Serializer.prototype.serialize).toHaveBeenCalledWith(model);
       optionsSpy.mockRestore();
     });
   });
@@ -832,8 +833,8 @@ describe('Model', () => {
           firstName: 'John',
           lastName: 'Doe'
         }));
-        expect(JSONAPISerializer.Deserializer.mock.instances.length).toBe(1);
-        expect(JSONAPISerializer.Deserializer).toHaveBeenCalledWith(User.deserializerOptions);
+        expect(Deserializer.mock.instances.length).toBe(1);
+        expect(Deserializer).toHaveBeenCalledWith(User.deserializerOptions);
       });
     });
   });

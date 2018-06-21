@@ -1,5 +1,6 @@
 const Errors = require('./jsonapi-error');
-const { Serializer, Deserializer } = require('jsonapi-serializer');
+const Serializer = require('jsonapi-serializer/lib/serializer');
+const Deserializer = require('jsonapi-serializer/lib/deserializer');
 
 class Base {
   static baseURL = '';
