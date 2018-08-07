@@ -4,7 +4,7 @@ describe('HttpAdapter', () => {
   describe('instantiation', () => {
     test('it sets the right defaults if nothing is passed in', () => {
       const adapter = new HttpAdapter();
-      expect(adapter.host).toBe(`${window.location.protocol}//${window.location.host}`);
+      expect(adapter.host).toBe('');
       expect(adapter.namespace).toBe('');
       expect(adapter.headers).toEqual({
         Accept: 'application/json',
