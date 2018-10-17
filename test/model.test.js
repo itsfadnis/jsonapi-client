@@ -12,6 +12,9 @@ describe('Model', () => {
           id: 1,
           links: {
             self: '/foo/1'
+          },
+          meta: {
+            totalRecords: 50
           }
         });
 
@@ -20,6 +23,9 @@ describe('Model', () => {
         expect(model.errors).toEqual(new JSONAPIError());
         expect(model.links).toEqual({
           self: '/foo/1'
+        });
+        expect(model.meta).toEqual({
+          totalRecords: 50
         });
       });
     });
