@@ -809,15 +809,15 @@ describe('Model', () => {
   });
 
   describe('.deserialize(response)', () => {
-    test('it deserializes the response', () => {
-      class User extends Model {
-        constructor(args) {
-          super(args);
-          this.firstName = args.firstName;
-          this.lastName = args.lastName;
-        }
+    class User extends Model {
+      constructor(args) {
+        super(args);
+        this.firstName = args.firstName;
+        this.lastName = args.lastName;
       }
+    }
 
+    test('it deserializes the response', () => {
       return User.deserialize({
         data: {
           type: 'users',
@@ -835,6 +835,34 @@ describe('Model', () => {
         }));
         expect(Deserializer.mock.instances.length).toBe(1);
         expect(Deserializer).toHaveBeenCalledWith(User.deserializerOptions);
+      });
+    });
+
+    test('it extracts links & meta for a collection', () => {
+      const deserializedArray = [{
+        id: '123',
+        firstName: 'John',
+        lastName: 'Doe'
+      }, {
+        id: '456',
+        firstName: 'Jane',
+        lastName: 'Doe'
+      }];
+      deserializedArray.links = {
+        all: '/users'
+      };
+      deserializedArray.meta = {
+        count: 2
+      };
+      const deserializeSpy = jest
+        .spyOn(Deserializer.prototype, 'deserialize')
+        .mockResolvedValue(deserializedArray);
+      return User.deserialize('foo').then((array) => {
+        expect(array[0]).toEqual(new User({ id: '123', firstName: 'John', lastName: 'Doe' }));
+        expect(array[1]).toEqual(new User({ id: '456', firstName: 'Jane', lastName: 'Doe' }));
+        expect(array.links).toEqual({ all: '/users' });
+        expect(array.meta).toEqual({ count: 2 });
+        deserializeSpy.mockRestore();
       });
     });
   });
