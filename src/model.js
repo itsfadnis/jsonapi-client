@@ -184,7 +184,14 @@ class Base {
       .deserialize(response)
       .then((data) => {
         if (Array.isArray(data)) {
-          return data.map(object => new this(object));
+          const collection = data.map(object => new this(object));
+          if (data.links) {
+            collection.links = data.links;
+          }
+          if (data.meta) {
+            collection.meta = data.meta;
+          }
+          return collection;
         }
         return new this(data);
       });
