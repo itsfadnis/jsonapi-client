@@ -272,6 +272,13 @@ describe('Model', () => {
         boo: 'baz'
       })).toBe('foo=bar&boo=baz');
     });
+
+    test('it returns a query string', () => {
+      expect(Model.toQueryString({
+        foo: 'bar',
+        bar: [1, 2]
+      })).toBe('foo=bar&bar[]=1&bar[]=2');
+    });
   });
 
   describe('.query(query, args)', () => {

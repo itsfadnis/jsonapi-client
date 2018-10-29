@@ -123,14 +123,30 @@ class Base {
     return this.baseURL.match(/:\w+/g);
   }
 
-  static toQueryString(obj = {}) {
-    let q = [];
-    for (const key in obj) {
-      if (obj.hasOwnProperty(key)) {
-        q.push(encodeURIComponent(key) + '=' + encodeURIComponent(obj[key]));
+  static toQueryString(params = {}, prefix) {
+    const query = Object.keys(params).map((k) => {
+      let key = k;
+      const value = params[key];
+
+      switch (params.constructor) {
+      case Array:
+        key = `${prefix}[]`;
+        break;
+      case Object:
+        key = (prefix ? `${prefix}[${key}]` : key);
+        break;
+      default:
+        break;
       }
-    }
-    return q.join('&');
+
+      if (typeof value === 'object') {
+        return this.toQueryString(value, key); // for nested objects
+      }
+
+      return `${key}=${encodeURIComponent(value)}`;
+    });
+
+    return [ ...query ].join('&');
   }
 
   static constructBaseURL(args = {}) {
