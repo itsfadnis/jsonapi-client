@@ -277,7 +277,7 @@ describe('Model', () => {
       expect(Model.toQueryString({
         foo: 'bar',
         bar: [1, 2]
-      })).toBe('foo=bar&bar[]=1&bar[]=2');
+      })).toBe('foo=bar&bar%5B%5D=1&bar%5B%5D=2');
     });
   });
 
