@@ -130,7 +130,7 @@ class Base {
 
       switch (params.constructor) {
       case Array:
-        key = `${prefix}[]`;
+        key = encodeURIComponent(`${prefix}[]`);
         break;
       case Object:
         key = (prefix ? `${prefix}[${key}]` : key);
