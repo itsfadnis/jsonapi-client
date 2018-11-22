@@ -2751,7 +2751,7 @@ json5@^0.5.0, json5@^0.5.1:
 
 "jsonapi-serializer@git+https://github.com/itsfadnis/jsonapi-serializer.git":
   version "3.5.6"
-  resolved "git+https://github.com/itsfadnis/jsonapi-serializer.git#c2665e4d66ca63c677a0490dbf22dc4f6abbebe1"
+  resolved "git+https://github.com/itsfadnis/jsonapi-serializer.git#0784bb3c94c38cdf274764a80c1d30d17c8c0b3b"
   dependencies:
     inflected "^1.1.6"
     lodash "^4.16.3"
