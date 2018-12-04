@@ -307,7 +307,7 @@ class Base {
 
   destroy() {
     return this.constructor.adapter
-      .delete(`${ this.constructor.constructBaseURL() }/${ this.id }`)
+      .delete(`${ this.constructBaseURL() }/${ this.id }`)
       .catch((err) => { throw err; });
   }
 

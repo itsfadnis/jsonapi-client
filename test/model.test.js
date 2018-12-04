@@ -673,7 +673,7 @@ describe('Model', () => {
           id: '123'
         });
 
-        const constructBaseURLSpy = jest.spyOn(Model, 'constructBaseURL').mockReturnValue('/xyz');
+        const constructBaseURLSpy = jest.spyOn(Model.prototype, 'constructBaseURL').mockReturnValue('/xyz');
 
         return model.destroy().then((response) => {
           expect(Model.adapter.delete.mock.calls[0][0]).toBe('/xyz/123');
@@ -702,7 +702,7 @@ describe('Model', () => {
           id: '123'
         });
 
-        const constructBaseURLSpy = jest.spyOn(Model, 'constructBaseURL').mockReturnValue('/xyz');
+        const constructBaseURLSpy = jest.spyOn(Model.prototype, 'constructBaseURL').mockReturnValue('/xyz');
 
         return model.destroy().catch((response) => {
           expect(Model.adapter.delete.mock.calls[0][0]).toBe('/xyz/123');
