@@ -796,7 +796,8 @@ describe('Model', () => {
   });
 
   describe('#serialize()', () => {
-    test('it serializes the model', () => {
+    test('it serializes the model when jsonapi type is explicitly specified', () => {
+      Model._type = 'foo';
       const model = new Model();
       const optionsSpy = jest.spyOn(model, 'serializerOptions').mockReturnValue({
         attributes: ['firstName', 'lastName']
@@ -813,11 +814,21 @@ describe('Model', () => {
       });
       expect(optionsSpy).toHaveBeenCalled();
       expect(Serializer.mock.instances.length).toBe(1);
-      expect(Serializer).toHaveBeenCalledWith('base', {
+      expect(Serializer).toHaveBeenCalledWith('foo', {
         attributes: ['firstName', 'lastName']
       });
       expect(Serializer.prototype.serialize).toHaveBeenCalledWith(model);
       optionsSpy.mockRestore();
+      delete Model._type;
+    });
+
+    test('it throws an expection when the jsonapi type is not specified', () => {
+      const model = new Model();
+      try {
+        model.serialize();
+      } catch (err) {
+        expect(err.message).toBe('Resource object missing jsonapi type.\nSet static property _type to the model class.');
+      }
     });
   });
 

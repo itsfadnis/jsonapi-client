@@ -199,8 +199,11 @@ class Base {
   };
 
   serialize() {
+    if (!this.constructor._type) {
+      throw new Error('Resource object missing jsonapi type.\nSet static property _type to the model class.');
+    }
     return new Serializer(
-      this.constructor.name.toLowerCase(),
+      this.constructor._type,
       this.serializerOptions()
     ).serialize(this);
   }
