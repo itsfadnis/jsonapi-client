@@ -13,9 +13,9 @@ class HttpAdapter {
 
   extractResponseHeaders(response) {
     let object = {};
-    for (const [key, value] of response.headers.entries()) {
+    response.headers.forEach((value, key) => {
       object[key] = value;
-    }
+    });
     return object;
   }
 
