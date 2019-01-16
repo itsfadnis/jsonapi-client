@@ -56,8 +56,13 @@ Default deserializer options are defined on the static property `Model.deseriali
 
 ### Model definition
 
+From [v2.0.1](https://github.com/itsfadnis/jsonapi-client/releases/tag/v2.0.1), it is mandatory for a model to have `_type` defined as a static property.
+`Model._type` is used to describe the [type of resource objects](https://jsonapi.org/format/#document-resource-object-identification).
+
 ```javascript
 class Address extends Model {
+  static _type = 'addresses';
+
   // Always set the base url of your resource on this property
   static baseURL = '/addresses';
 
@@ -70,6 +75,8 @@ class Address extends Model {
 }
 
 class DriversLicense extends Model {
+  static _type = 'drivers-license';
+
   // Specify url parameters for nested resources
   static baseURL = '/people/:person_id/drivers_license';
 
@@ -90,6 +97,8 @@ class DriversLicense extends Model {
 }
 
 class Person extends Model {
+  static _type = 'people';
+
   static baseURL = '/people';
 
   constructor(args = {}) {
@@ -110,6 +119,8 @@ class Person extends Model {
 
 ```javascript
 class Post extends Model {
+  static _type = 'posts';
+
   static baseURL = '/posts';
 
   constructor(args) {
