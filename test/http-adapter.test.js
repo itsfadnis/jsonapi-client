@@ -1,3 +1,4 @@
+require('cross-fetch/polyfill');
 const HttpAdapter = require('../src/http-adapter');
 
 describe('HttpAdapter', () => {
@@ -37,12 +38,12 @@ describe('HttpAdapter', () => {
 
   describe('#extractResponseHeaders(response)', () => {
     const adapter = new HttpAdapter();
-    const mockResponse = {
-      status: 200,
+    const mockResponse = new Response(null, {
       headers: {
-        entries: () => [['content-type', 'application/json'], ['charset', 'utf8']]
+        'content-type': 'application/json',
+        charset: 'utf8'
       }
-    };
+    });
     expect(adapter.extractResponseHeaders(mockResponse)).toEqual({
       'content-type': 'application/json',
       charset: 'utf8'
