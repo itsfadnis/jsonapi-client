@@ -251,17 +251,13 @@ class Base {
   static fetch(id, args = {}) {
     return this.adapter
       .get(`${ this.constructBaseURL(args) }/${ id }`)
-      .then(({ data }) => this.deserialize(data))
-      .then(object => object)
-      .catch((err) => { throw err; });
+      .then(({ data }) => this.deserialize(data));
   }
 
   static fetchAll(args = {}) {
     return this.adapter
       .get(`${ this.constructBaseURL(args) }`)
-      .then(({ data }) => this.deserialize(data))
-      .then(array => array)
-      .catch((err) => { throw err; });
+      .then(({ data }) => this.deserialize(data));
   }
 
   static query(query = {}, args = {}) {
@@ -269,16 +265,13 @@ class Base {
     const requestURL = this.constructBaseURL(args);
     return this.adapter
       .get(`${requestURL}?${queryString}`)
-      .then(({ data }) => this.deserialize(data))
-      .then(array => array)
-      .catch((err) => { throw err; });
+      .then(({ data }) => this.deserialize(data));
   }
 
   _create() {
     return this.constructor.adapter
       .post(this.constructBaseURL(), this.serialize())
       .then(({ data }) => this.constructor.deserialize(data))
-      .then(object => object)
       .catch((err) => {
         this.errors = new Errors(err.data);
         throw err;
@@ -289,7 +282,6 @@ class Base {
     return this.constructor.adapter
       .patch(`${ this.constructBaseURL() }/${ this.id }`, this.serialize())
       .then(({ data }) => this.constructor.deserialize(data))
-      .then(object => object)
       .catch((err) => {
         this.errors = new Errors(err.data);
         throw err;
