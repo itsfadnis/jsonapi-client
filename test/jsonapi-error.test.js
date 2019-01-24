@@ -84,6 +84,18 @@ describe('JSONAPIError', () => {
       const jsonapiError = new JSONAPIError({
         errors: [
           {
+            code:   '422',
+            source: { pointer: '/data/attributes/answers', parameter: 14 },
+            title:  'Length exceeds',
+            detail: 'Could be maximum 10 character long'
+          },
+          {
+            code:   '422',
+            source: { pointer: '/data/attributes/answers', parameter: 15 },
+            title:  'Length exceeds',
+            detail: 'could be maximum 10character long'
+          },
+          {
             code:   '123',
             source: { pointer: '/data/attributes/first-name' },
             title:  'Value is too short',
@@ -109,6 +121,22 @@ describe('JSONAPIError', () => {
       });
 
       expect(jsonapiError.extract()).toEqual({
+        14: [
+          {
+            code:   '422',
+            source: { pointer: '/data/attributes/answers', parameter: 14 },
+            title:  'Length exceeds',
+            detail: 'Could be maximum 10 character long'
+          }
+        ],
+        15: [
+          {
+            code:   '422',
+            source: { pointer: '/data/attributes/answers', parameter: 15 },
+            title:  'Length exceeds',
+            detail: 'could be maximum 10character long'
+          }
+        ],
         password: [
           {
             code:   '225',
