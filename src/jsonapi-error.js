@@ -64,7 +64,7 @@ class JSONAPIError {
         let key;
 
         if (error.source.parameter) {
-          key = parameter;
+          key = error.source.parameter;
         }
 
         if (!key && error.source.pointer) {
@@ -76,6 +76,7 @@ class JSONAPIError {
           object[key].push(error);
         }
       }
+
       return object;
     }, {});
   }
