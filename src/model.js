@@ -248,9 +248,13 @@ class Base {
   // }
   validate() {}
 
-  static fetch(id, args = {}) {
+  static fetch(id, args = {}, query) {
+    let requestURL = `${this.constructBaseURL(args)}/${id}`;
+    if (typeof query === 'object') {
+      requestURL += `?${this.toQueryString(query)}`;
+    }
     return this.adapter
-      .get(`${ this.constructBaseURL(args) }/${ id }`)
+      .get(requestURL)
       .then(({ data }) => this.deserialize(data));
   }
 

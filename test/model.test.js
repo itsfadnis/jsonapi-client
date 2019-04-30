@@ -194,7 +194,7 @@ describe('Model', () => {
     });
   });
 
-  describe('.fetch(id, args)', () => {
+  describe('.fetch(id, args, query)', () => {
     afterEach(() => {
       delete Model.adapter;
     });
@@ -218,12 +218,12 @@ describe('Model', () => {
           Promise.resolve(mockDeserializedObject)
         );
 
-        return Model.fetch('123', { foo: 'bar' }).then((response) => {
+        return Model.fetch('123', { foo: 'bar' }, { abc: 'def' }).then((response) => {
           expect(constructBaseURLSpy.mock.calls.length).toBe(1);
           expect(constructBaseURLSpy.mock.calls[0][0]).toEqual({ foo: 'bar' });
 
           expect(getSpy.mock.calls.length).toBe(1);
-          expect(getSpy.mock.calls[0]).toEqual(['/xyz/123']);
+          expect(getSpy.mock.calls[0]).toEqual(['/xyz/123?abc=def']);
 
           expect(deserializeSpy).toHaveBeenCalledWith({ id: '123' });
           expect(response).toEqual(mockDeserializedObject);
