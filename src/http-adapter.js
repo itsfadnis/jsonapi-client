@@ -5,7 +5,7 @@ class HttpAdapter {
     this.headers = {
       Accept: 'application/json',
       'Content-Type': 'application/json',
-      HTTP_X_REQUESTED_WITH: 'XMLHttpRequest',
+      'X-Requested-With': 'XMLHttpRequest',
       ...args.headers
     };
     this.fetch = args.fetch || window.fetch;

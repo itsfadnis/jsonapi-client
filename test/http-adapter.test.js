@@ -10,7 +10,7 @@ describe('HttpAdapter', () => {
       expect(adapter.headers).toEqual({
         Accept: 'application/json',
         'Content-Type': 'application/json',
-        HTTP_X_REQUESTED_WITH: 'XMLHttpRequest'
+        'X-Requested-With': 'XMLHttpRequest'
       });
       expect(adapter.fetch).toEqual(window.fetch);
     });
@@ -29,7 +29,7 @@ describe('HttpAdapter', () => {
       expect(adapter.headers).toEqual({
         Accept: 'application/json',
         'Content-Type': 'application/json',
-        HTTP_X_REQUESTED_WITH: 'XMLHttpRequest',
+        'X-Requested-With': 'XMLHttpRequest',
         boo: 'baz'
       });
       expect(adapter.fetch).toBe('fetchpassedin');
