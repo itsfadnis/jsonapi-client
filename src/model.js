@@ -128,19 +128,14 @@ class Base {
       let key = k;
       const value = params[key];
 
-      switch (params.constructor) {
-      case Array:
+      if (params.constructor === Array) {
         key = encodeURIComponent(`${prefix}[]`);
-        break;
-      case Object:
-        key = (prefix ? `${prefix}[${key}]` : key);
-        break;
-      default:
-        break;
+      } else if (params.constructor === Object) {
+        key = prefix ? `${prefix}[${key}]` : key;
       }
 
       if (typeof value === 'object') {
-        return this.toQueryString(value, key); // for nested objects
+        return this.toQueryString(value, key);
       }
 
       return `${key}=${encodeURIComponent(value)}`;
