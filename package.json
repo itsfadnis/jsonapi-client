@@ -4,7 +4,7 @@
   "main": "dist/index.js",
   "scripts": {
     "build": "babel src --out-dir dist",
-    "test": "jest",
+    "test": "yarn lint && jest",
     "lint": "eslint src test",
     "prepublish": "npm run build"
   },
