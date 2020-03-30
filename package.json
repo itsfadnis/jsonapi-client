@@ -4,7 +4,7 @@
   "main": "dist/index.js",
   "scripts": {
     "build": "babel src --out-dir dist",
-    "test": "yarn lint && jest",
+    "test": "yarn lint && jest && yarn build && bundlesize",
     "lint": "eslint src test",
     "prepublish": "npm run build"
   },
@@ -24,6 +24,7 @@
     "babel-core": "^7.0.0-0",
     "babel-eslint": "^8.2.2",
     "babel-jest": "^22.4.3",
+    "bundlesize": "^0.18.0",
     "cross-fetch": "^3.0.0",
     "eslint": "^4.18.2",
     "husky": "^4.2.3",
@@ -39,6 +40,19 @@
       "commit-msg": "commitlint -E HUSKY_GIT_PARAMS"
     }
   },
+  "bundlesize": [{
+    "path": "./dist/model.js",
+    "maxSize": "13 kB",
+    "compression": "none"
+  }, {
+    "path": "./dist/http-adapter.js",
+    "maxSize": "3.5 kB",
+    "compression": "none"
+  }, {
+    "path": "./dist/jsonapi-error.js",
+    "maxSize": "3.5 kB",
+    "compression": "none"
+  }],
   "repository": {
     "type": "git",
     "url": "https://github.com/itsfadnis/jsonapi-client.git"
