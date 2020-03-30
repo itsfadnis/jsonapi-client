@@ -6,7 +6,7 @@
     "build": "babel src --out-dir dist",
     "test": "yarn lint && jest && yarn build && bundlesize",
     "lint": "eslint src test",
-    "prepublish": "npm run build"
+    "prepare": "yarn build"
   },
   "author": "Nikhil Fadnis",
   "license": "ISC",
