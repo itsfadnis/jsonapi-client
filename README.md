@@ -2,6 +2,7 @@
 [![HitCount](http://hits.dwyl.io/itsfadnis/jsonapi-client.svg)](http://hits.dwyl.io/itsfadnis/jsonapi-client)
 [![Downloads](https://badgen.net/npm/dt/@itsfadnis/jsonapi-client)](https://www.npmjs.com/package/@itsfadnis/jsonapi-client)
 [![Size](https://badgen.net/bundlephobia/minzip/@itsfadnis/jsonapi-client)](https://bundlephobia.com/result?p=@itsfadnis/jsonapi-client)
+[![MIT](https://img.shields.io/github/license/mashape/apistatus.svg)](https://github.com/itsfadnis/jsonapi-client/blob/master/LICENSE)
 
 # jsonapi-client
 A convenient module to consume a jsonapi service
@@ -176,3 +177,8 @@ const p = new Post({
 
 p.destroy();
 ```
+
+## 📝 License
+
+Copyright © 2020 [Nikhil Fadnis](https://github.com/itsfadnis).<br />
+This project is [MIT](https://github.com/itsfadnis/jsonapi-client/blob/master/LICENSE) licensed.
