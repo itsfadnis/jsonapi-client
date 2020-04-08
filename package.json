@@ -3,32 +3,35 @@
   "version": "2.1.4",
   "main": "dist/index.js",
   "scripts": {
-    "build": "babel src --out-dir dist",
-    "test": "yarn lint && jest && yarn build && bundlesize",
-    "lint": "eslint src test",
+    "build": "tsc",
+    "lint": "eslint **/*.ts --fix",
+    "test": "eslint **/*.ts && jest && yarn build && bundlesize",
     "prepare": "yarn build"
   },
   "author": "Nikhil Fadnis",
   "license": "ISC",
   "description": "A convenient module to consume a jsonapi service",
   "dependencies": {
+    "isomorphic-fetch": "^2.2.1",
     "jsonapi-serializer": "git+https://github.com/itsfadnis/jsonapi-serializer.git"
   },
   "devDependencies": {
-    "@babel/cli": "^7.0.0-beta.42",
-    "@babel/core": "^7.0.0-beta.42",
-    "@babel/plugin-proposal-class-properties": "^7.0.0-beta.42",
-    "@babel/preset-env": "^7.0.0-beta.42",
     "@commitlint/cli": "^8.3.5",
     "@commitlint/config-conventional": "^8.3.4",
-    "babel-core": "^7.0.0-0",
-    "babel-eslint": "^8.2.2",
-    "babel-jest": "^22.4.3",
+    "@types/jest": "^25.2.1",
+    "@types/jsonapi-serializer": "^3.6.3",
+    "@typescript-eslint/eslint-plugin": "^2.27.0",
+    "@typescript-eslint/parser": "^2.27.0",
     "bundlesize": "^0.18.0",
-    "cross-fetch": "^3.0.0",
-    "eslint": "^4.18.2",
+    "eslint": "^6.8.0",
+    "eslint-config-prettier": "^6.10.1",
+    "eslint-plugin-prettier": "^3.1.2",
     "husky": "^4.2.3",
-    "jest": "^23.0.0-alpha.1"
+    "jest": "^25.2.7",
+    "nock": "^12.0.3",
+    "prettier": "^2.0.4",
+    "ts-jest": "^25.3.1",
+    "typescript": "^3.8.3"
   },
   "commitlint": {
     "extends": [
@@ -40,24 +43,33 @@
       "commit-msg": "commitlint -E HUSKY_GIT_PARAMS"
     }
   },
-  "bundlesize": [{
-    "path": "./dist/model.js",
-    "maxSize": "13 kB",
-    "compression": "none"
-  }, {
-    "path": "./dist/http-adapter.js",
-    "maxSize": "3.5 kB",
-    "compression": "none"
-  }, {
-    "path": "./dist/jsonapi-error.js",
-    "maxSize": "3.5 kB",
-    "compression": "none"
-  }],
+  "bundlesize": [
+    {
+      "path": "./dist/model.js",
+      "maxSize": "13 kB",
+      "compression": "none"
+    },
+    {
+      "path": "./dist/http-adapter.js",
+      "maxSize": "3.5 kB",
+      "compression": "none"
+    },
+    {
+      "path": "./dist/jsonapi-error.js",
+      "maxSize": "3.5 kB",
+      "compression": "none"
+    }
+  ],
   "repository": {
     "type": "git",
     "url": "https://github.com/itsfadnis/jsonapi-client.git"
   },
   "jest": {
+    "globals": {
+      "ts-jest": {
+        "tsConfig": "tsconfig.test.json"
+      }
+    },
     "collectCoverage": true,
     "verbose": true,
     "coverageThreshold": {
@@ -69,8 +81,16 @@
       }
     },
     "moduleNameMapper": {
-      "jsonapi-serializer/lib/serializer": "<rootDir>/test/__mocks__/serializer.js",
-      "jsonapi-serializer/lib/deserializer": "<rootDir>/test/__mocks__/deserializer.js"
-    }
+      "jsonapi-serializer/lib/serializer": "<rootDir>/test/__mocks__/serializer.ts",
+      "jsonapi-serializer/lib/deserializer": "<rootDir>/test/__mocks__/deserializer.ts"
+    },
+    "transform": {
+      ".ts": "ts-jest"
+    },
+    "testRegex": "(/__tests__/.*|\\.(test|spec))\\.ts$",
+    "moduleFileExtensions": [
+      "ts",
+      "js"
+    ]
   }
 }

@@ -1,4 +1,4 @@
-var Serializer = jest.fn();
+const Serializer = jest.fn();
 
 Serializer.prototype.serialize = jest.fn().mockReturnValue({
   data: {
@@ -6,9 +6,9 @@ Serializer.prototype.serialize = jest.fn().mockReturnValue({
     id: '123',
     attributes: {
       'first-name': 'John',
-      'last-name': 'Doe'
-    }
-  }
+      'last-name': 'Doe',
+    },
+  },
 });
 
-module.exports = Serializer;
+export default Serializer;
