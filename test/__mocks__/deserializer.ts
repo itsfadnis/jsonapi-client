@@ -6,4 +6,4 @@ Deserializer.prototype.deserialize = jest.fn().mockResolvedValue({
   lastName: 'Doe',
 });
 
-export default Deserializer;
+export = Deserializer;

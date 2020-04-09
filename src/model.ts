@@ -1,5 +1,5 @@
-import Serializer from 'jsonapi-serializer/lib/serializer';
-import Deserializer from 'jsonapi-serializer/lib/deserializer';
+import Serializer = require('jsonapi-serializer/lib/serializer');
+import Deserializer = require('jsonapi-serializer/lib/deserializer');
 import JSONAPIError from './jsonapi-error';
 import HttpAdapter, { ResponsePayload, HttpAdapterConstructor } from './http-adapter';
 import { SerializerOptions, DeserializerOptions } from 'jsonapi-serializer';

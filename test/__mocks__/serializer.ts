@@ -11,4 +11,4 @@ Serializer.prototype.serialize = jest.fn().mockReturnValue({
   },
 });
 
-export default Serializer;
+export = Serializer;
