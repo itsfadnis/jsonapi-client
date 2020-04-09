@@ -4,10 +4,10 @@
     @typescript-eslint/camelcase: 0
 */
 
-import Model from '../src/model';
+import Model = require('../src/model');
 import JSONAPIError from '../src/jsonapi-error';
-import Serializer from 'jsonapi-serializer/lib/serializer';
-import Deserializer from 'jsonapi-serializer/lib/deserializer';
+import Serializer = require('jsonapi-serializer/lib/serializer');
+import Deserializer = require('jsonapi-serializer/lib/deserializer');
 
 namespace Util {
   export class Address extends Model {
