@@ -303,35 +303,35 @@ class Model {
     );
   }
 
-  _update(): Promise<Model> {
+  private _update(): Promise<ResponsePayload> {
     // eslint-disable-next-line
     // @ts-ignore
-    const { adapter, deserialize } = this.constructor;
-    return adapter
-      .patch(`${this.constructBaseURL()}/${this.id}`, this.serialize())
-      .then((response: ResponsePayload): Promise<Model> => deserialize(response.data))
-      .catch((err: ResponsePayload) => {
-        this.errors = new JSONAPIError(err.data);
-        throw err;
-      });
+    return this.constructor.adapter.patch(`${this.constructBaseURL()}/${this.id}`, this.serialize());
   }
 
-  _create(): Promise<Model> {
+  private _create(): Promise<ResponsePayload> {
     // eslint-disable-next-line
     // @ts-ignore
-    const { adapter, deserialize } = this.constructor;
-    return adapter
-      .post(this.constructBaseURL(), this.serialize())
-      .then((response: ResponsePayload): Promise<Model> => deserialize(response.data))
-      .catch((err: ResponsePayload) => {
-        this.errors = new JSONAPIError(err.data);
-        throw err;
-      });
+    return this.constructor.adapter.post(this.constructBaseURL(), this.serialize());
+  }
+
+  private processErrorResponse(response: ResponsePayload): never {
+    this.errors = new JSONAPIError(response.data);
+    throw response;
   }
 
   save(): Promise<Model> {
     if (!this.valid) return Promise.reject(new Error('Unprocessable Entity'));
-    return this.persisted ? this._update() : this._create();
+
+    return (this.persisted ? this._update() : this._create())
+      .then(
+        (response: ResponsePayload): Promise<Model> => {
+          // eslint-disable-next-line
+          // @ts-ignore
+          return this.constructor.deserialize(response.data);
+        },
+      )
+      .catch(this.processErrorResponse.bind(this));
   }
 
   static destroy(id, args = {}): Promise<ResponsePayload> {

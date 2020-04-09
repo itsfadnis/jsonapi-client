@@ -1,7 +1,7 @@
 {
   "name": "@itsfadnis/jsonapi-client",
   "version": "2.1.4",
-  "main": "dist/index.js",
+  "main": "dist/model.js",
   "scripts": {
     "build": "tsc",
     "lint": "eslint **/*.ts --fix",
