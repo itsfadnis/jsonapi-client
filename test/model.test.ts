@@ -421,41 +421,15 @@ describe('Model', () => {
     });
   });
 
-  describe('#save()', () => {
-    describe('on invalid model', () => {
+  describe('#save(), on a invalid model', () => {
+    test('it throws a 422 error', () => {
       const model = new Model();
       jest.spyOn(model, 'valid', 'get').mockReturnValue(false);
       expect(model.save()).rejects.toEqual(new Error('Unprocessable Entity'));
     });
-
-    describe('on persisted model', () => {
-      test('it calls & returns #_update()', () => {
-        const model = new Model();
-        model.persisted = true;
-        model._update = jest.fn().mockReturnValue('something');
-
-        const returnValue = model.save();
-
-        expect(returnValue).toBe('something');
-        expect(model._update).toHaveBeenCalled();
-      });
-    });
-
-    describe('on new model', () => {
-      test('it calls & returns #_create()', () => {
-        const model = new Model();
-        model.persisted = false;
-        model._create = jest.fn().mockReturnValue('something');
-
-        const returnValue = model.save();
-
-        expect(returnValue).toBe('something');
-        expect(model._create).toHaveBeenCalled();
-      });
-    });
   });
 
-  describe('#_create()', () => {
+  describe('#save(), on a new model', () => {
     beforeEach(() => {
       Model.configureAdapter();
     });
@@ -486,7 +460,7 @@ describe('Model', () => {
         const deserializeSpy = jest.spyOn(Model, 'deserialize').mockResolvedValue(mockDeserializedObject);
 
         const model = new Model();
-        return model._create().then((response) => {
+        return model.save().then((response) => {
           expect(postSpy).toHaveBeenCalledWith(model.constructBaseURL(), mockSerializedObject);
           expect(serializeSpy).toHaveBeenCalled();
           expect(deserializeSpy).toHaveBeenCalledWith(mockResponse.data);
@@ -511,7 +485,7 @@ describe('Model', () => {
         });
         const model = new Model();
 
-        return model._create().catch((response) => {
+        return model.save().catch((response) => {
           expect(postSpy).toHaveBeenCalledWith(model.constructBaseURL(), { foo: 'bar' });
           expect(serializeSpy).toHaveBeenCalled();
           expect(response).toEqual(mockResponse);
@@ -522,7 +496,7 @@ describe('Model', () => {
     });
   });
 
-  describe('#_update()', () => {
+  describe('#save(), on an existing model', () => {
     beforeEach(() => {
       Model.configureAdapter();
     });
@@ -558,7 +532,7 @@ describe('Model', () => {
           id: '123',
         });
 
-        return model._update().then((response) => {
+        return model.save().then((response) => {
           expect(patchSpy).toHaveBeenCalledWith(`${model.constructBaseURL()}/123`, mockSerializedObject);
           expect(serializeSpy).toHaveBeenCalled();
           expect(deserializeSpy).toHaveBeenCalledWith(mockResponse.data);
@@ -596,7 +570,7 @@ describe('Model', () => {
           id: '123',
         });
 
-        return model._update().catch((response) => {
+        return model.save().catch((response) => {
           expect(patchSpy).toHaveBeenCalledWith(`${model.constructBaseURL()}/123`, mockSerializedObject);
           expect(serializeSpy).toHaveBeenCalled();
           expect(model.errors).toEqual(new JSONAPIError(response.data));
