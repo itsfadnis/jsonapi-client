@@ -20,18 +20,35 @@ $ yarn add @itsfadnis/jsonapi-client
 
 ### Configure
 
+Configure the client's http adapter. The options are as defined below:
+
+| Name                 | Description                 | Default value |
+| ---------------------|-----------------------------|---------------|
+| host (*string*)      | Server host address         | ''            |
+| namespace (*string*) | API namespace (if any)      | ''            |
+| headers (*object*)   | Request headers             | {}            |
+
+- For versions `3.0.0` & above:
+```javascript
+import Model from '@itsfadnis/jsonapi-client';
+
+Model.configureAdapter({
+  host: 'https://example.com',
+  namespace: '/api',
+  headers: {
+    authorization: 'Basic YWxhZGRpbjpvcGVuc2VzYW1l'
+  }
+})
+```
+
+- For versions below `3.0.0`:
 ```javascript
 import { HttpAdapter, Model } from '@itsfadnis/jsonapi-client';
 
-// Setup an instance of the adapter for the model
 Model.adapter = new HttpAdapter({
-  // Defaults to `${window.location.protocol}//${window.location.host}`
   host: 'https://foo.com',
-  // Defaults to ''
-  namespace: '/v2',
-  headers: {
-    key: 'value'
-  },
+  namespace: '/api',
+  headers: { authorization: 'Basic YWxhZGRpbjpvcGVuc2VzYW1l' },
   // The adapter uses the Fetch API for making network requests
   // You can pass it in as an option, else it will default to window.fetch
   fetch: window.fetch
