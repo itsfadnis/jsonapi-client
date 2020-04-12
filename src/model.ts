@@ -335,17 +335,13 @@ class Model {
   }
 
   static destroy(id, args = {}): Promise<ResponsePayload> {
-    return this.adapter.delete(`${this.constructBaseURL(args)}/${id}`).catch((err) => {
-      throw err;
-    });
+    return this.adapter.delete(`${this.constructBaseURL(args)}/${id}`);
   }
 
   destroy(): Promise<ResponsePayload> {
     // eslint-disable-next-line
     // @ts-ignore
-    return this.constructor.adapter.delete(`${this.constructBaseURL()}/${this.id}`).catch((err) => {
-      throw err;
-    });
+    return this.constructor.adapter.delete(`${this.constructBaseURL()}/${this.id}`);
   }
 
   static new(args: ModelConstructor = {}): Model {
