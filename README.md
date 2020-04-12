@@ -1,4 +1,5 @@
 [![Build Status](https://semaphoreci.com/api/v1/itsfadnis/jsonapi-client/branches/master/badge.svg)](https://semaphoreci.com/itsfadnis/jsonapi-client)
+<img alt="Version" src="https://img.shields.io/badge/version-3.0.0-blue.svg?cacheSeconds=2592000" />
 [![HitCount](http://hits.dwyl.io/itsfadnis/jsonapi-client.svg)](http://hits.dwyl.io/itsfadnis/jsonapi-client)
 [![Downloads](https://badgen.net/npm/dt/@itsfadnis/jsonapi-client)](https://www.npmjs.com/package/@itsfadnis/jsonapi-client)
 [![Size](https://badgen.net/bundlephobia/minzip/@itsfadnis/jsonapi-client)](https://bundlephobia.com/result?p=@itsfadnis/jsonapi-client)
