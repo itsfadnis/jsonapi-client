@@ -292,7 +292,7 @@ class Model {
     );
   }
 
-  static query(query, args): Promise<Collection<ModelConstructor>> {
+  static query(query, args): Promise<Collection<Model>> {
     const requestURL = this.constructBaseURL(args);
     const queryString = this.toQueryString(query);
     return (
