@@ -5,8 +5,8 @@
   "types": "dist/model.d.ts",
   "scripts": {
     "build": "tsc",
-    "lint": "eslint src/*.ts --fix",
-    "test": "eslint src/*.ts && jest && yarn build && bundlesize",
+    "lint": "eslint **/*.ts --fix",
+    "test": "eslint **/*.ts && jest && yarn build && bundlesize",
     "prepare": "yarn build"
   },
   "author": "Nikhil Fadnis",
