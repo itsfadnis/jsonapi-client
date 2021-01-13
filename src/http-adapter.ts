@@ -58,7 +58,7 @@ interface HttpAdapterInterface {
   post(url: string, data: object): HttpResponse;
   put(url: string, data: object): HttpResponse;
   patch(url: string, data: object): HttpResponse;
-  delete(url: string): HttpResponse;
+  delete(url: string, data: object): HttpResponse;
 }
 
 class HttpAdapter implements HttpAdapterInterface {
@@ -129,8 +129,8 @@ class HttpAdapter implements HttpAdapterInterface {
     return this.request(HttpVerb.Patch, url, data);
   }
 
-  delete(url: string): HttpResponse {
-    return this.request(HttpVerb.Delete, url);
+  delete(url: string, data?: object): HttpResponse {
+    return this.request(HttpVerb.Delete, url, data);
   }
 }
 

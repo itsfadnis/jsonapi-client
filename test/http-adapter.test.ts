@@ -190,8 +190,8 @@ describe('HttpAdapter', () => {
 
     describe('#delete(url)', () => {
       test('it calls & returns #request(method, url, data) with the right params', () => {
-        expect(adapter.delete('/xyz')).resolves.toEqual(mockResponse);
-        expect(requestSpy).toHaveBeenCalledWith('DELETE', '/xyz');
+        expect(adapter.delete('/xyz', 'foo')).resolves.toEqual(mockResponse);
+        expect(requestSpy).toHaveBeenCalledWith('DELETE', '/xyz', 'foo');
       });
     });
   });
