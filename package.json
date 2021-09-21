@@ -1,5 +1,5 @@
 {
-  "name": "@itsfadnis/jsonapi-client",
+  "name": "jsonapi-client",
   "version": "3.0.2",
   "main": "dist/model.js",
   "types": "dist/model.d.ts",
@@ -9,7 +9,7 @@
     "test": "eslint **/*.ts && jest && yarn build && bundlesize",
     "prepare": "yarn build"
   },
-  "author": "Nikhil Fadnis",
+  "author": "Bang The Table",
   "license": "ISC",
   "description": "A convenient module to consume a jsonapi service",
   "dependencies": {
@@ -17,8 +17,6 @@
     "jsonapi-serializer": "git+https://github.com/itsfadnis/jsonapi-serializer.git"
   },
   "devDependencies": {
-    "@commitlint/cli": "^8.3.5",
-    "@commitlint/config-conventional": "^8.3.4",
     "@types/jest": "^25.2.1",
     "@types/jsonapi-serializer": "^3.6.3",
     "@typescript-eslint/eslint-plugin": "^2.27.0",
@@ -33,16 +31,6 @@
     "prettier": "^2.0.4",
     "ts-jest": "^25.3.1",
     "typescript": "^3.8.3"
-  },
-  "commitlint": {
-    "extends": [
-      "@commitlint/config-conventional"
-    ]
-  },
-  "husky": {
-    "hooks": {
-      "commit-msg": "commitlint -E HUSKY_GIT_PARAMS"
-    }
   },
   "bundlesize": [
     {

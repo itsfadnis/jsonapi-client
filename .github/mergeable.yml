@@ -1,0 +1,21 @@
+version: 2
+mergeable:
+  - when: pull_request.*, pull_request_review.*
+    validate:
+      - do: title
+        must_include:
+          regex: '(([A-Z][A-Z0-9]+-\d+):)?(\s)?.+' # BP-123 My Feature Title
+          regex_flag: none
+          message: 'Title should be in the format BP-123: Awesome PR'
+      - do: commit
+        message:
+          regex: '^(feat|docs|chore|fix|refactor|test|style|perf|build|deps|ci)(\(.+\))?:((.|\n)*)+$'
+          message: 'Semantic release conventions must be followed' # Semantic release conventions must be followed
+          skip_merge: true # Optional, Default is true. Will skip commit with message that includes 'Merge'
+          oldest_only: false # Optional, Default is false. Only check the regex against the oldest commit
+          single_commit_only: false # Optional, Default is false. only process this validator if there is one commit
+
+    pass:
+      - do: merge
+      - do: checks
+        status: 'success'
